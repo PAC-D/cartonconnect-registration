@@ -354,3 +354,7 @@ grant execute on function public.get_admin_registrations(text) to anon, authenti
 grant execute on function public.update_admin_registration(text, text, bigint, text, text, text, text, jsonb, jsonb) to anon, authenticated;
 grant execute on function public.delete_admin_registration(text, text, bigint) to anon, authenticated;
 grant execute on function public.change_admin_password(text, text) to anon, authenticated;
+
+-- Make PostgREST pick up the new columns and function signatures immediately,
+-- so the API does not answer "Could not find the function ... in the schema cache".
+notify pgrst, 'reload schema';
