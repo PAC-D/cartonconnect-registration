@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="CartonConnect admin dashboard.">
-  <title>Admin Dashboard | CartonConnect</title>
+  <meta name="description" content="Carton Connect admin dashboard.">
+  <title>Admin Dashboard | Carton Connect</title>
   <link rel="icon" href="../assets/favicon.png" type="image/png">
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="dashboard.css">
@@ -12,74 +12,101 @@
 <body class="dashboard-body">
   <div id="auth-check" class="auth-check">Checking session...</div>
   <div id="dashboard-shell" hidden>
-    <header class="site-header compact-header">
-      <div class="header-inner">
-        <a class="brand" href="../" aria-label="CartonConnect registration"><img class="pacd-logo" src="../assets/pacd.png" alt="PACD"></a>
-        <div class="title-block"><p class="eyebrow">Administration</p><h1>CartonConnect</h1></div>
-        <button id="logout-button" class="secondary-button" type="button">Log out</button>
-      </div>
-    </header>
-    <main class="dashboard-main">
-      <div class="dashboard-heading">
-        <div><p class="step-label">Admin dashboard</p><h2>Registrations</h2></div>
-        <div class="heading-actions">
-          <input id="search-input" class="search-input" type="search" placeholder="Search registrations" aria-label="Search registrations">
-          <button id="refresh-button" class="secondary-button" type="button">Refresh</button>
-          <button id="settings-button" class="secondary-button" type="button">Password</button>
+    <header class="topbar">
+      <div class="topbar-inner topbar-wide">
+        <a class="topbar-brand" href="../" aria-label="Carton Connect registration">
+          <img class="pacd-logo" src="../assets/pacd.png" alt="PacD">
+          <span class="topbar-divider" aria-hidden="true"></span>
+          <span class="topbar-name">Carton Connect</span>
+          <span class="topbar-tag">Admin</span>
+        </a>
+        <div class="topbar-actions">
+          <button id="settings-button" class="ghost-button" type="button">Change password</button>
+          <button id="logout-button" class="ghost-button" type="button">Log out</button>
         </div>
       </div>
-      <div class="summary-row" aria-live="polite">
-        <span><strong id="total-count">0</strong> total</span>
-        <span><strong id="supplier-count">0</strong> suppliers</span>
-        <span><strong id="factory-registration-count">0</strong> factories</span>
-        <span><strong id="packaging-count">0</strong> packaging suppliers</span>
+    </header>
+
+    <main class="dashboard-main">
+      <div class="dashboard-heading">
+        <div>
+          <h1>Registrations</h1>
+          <p id="total-lines" class="heading-meta">0 registrations</p>
+        </div>
+        <div class="segmented" role="tablist" aria-label="Registration type">
+          <button class="segment" type="button" role="tab" data-tab="Supplier" aria-selected="true">Suppliers <span data-tab-count="Supplier">0</span></button>
+          <button class="segment" type="button" role="tab" data-tab="Factory" aria-selected="false">Factories <span data-tab-count="Factory">0</span></button>
+          <button class="segment" type="button" role="tab" data-tab="Packaging supplier" aria-selected="false">Packaging suppliers <span data-tab-count="Packaging supplier">0</span></button>
+        </div>
       </div>
+
+      <section class="filter-card" aria-label="Search and export">
+        <div class="filter-field">
+          <label for="search-input">Search</label>
+          <input id="search-input" type="search" autocomplete="off">
+        </div>
+        <div class="filter-actions">
+          <button id="refresh-button" class="soft-button" type="button">Refresh</button>
+          <button id="export-button" class="primary-button" type="button">Export Excel</button>
+        </div>
+      </section>
+
+      <section class="analytics-card" aria-label="Section analytics" aria-live="polite">
+        <div class="coverage">
+          <div class="coverage-figure"><strong id="stat-registered">0 / 0</strong><span id="stat-registered-label">registered</span><span id="stat-percent" class="coverage-percent">0%</span></div>
+          <div class="progress" aria-hidden="true"><span id="stat-progress"></span></div>
+        </div>
+        <div class="stat"><strong id="stat-people">0</strong><span>people registered</span></div>
+        <div class="stat"><strong id="stat-missing">0</strong><span id="stat-missing-label">not registered</span></div>
+        <details class="missing-list">
+          <summary id="missing-summary">Show not registered</summary>
+          <ul id="missing-items"></ul>
+        </details>
+      </section>
+
       <section class="table-card" aria-label="Registration records">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Type</th><th>Name</th><th>Email</th><th>Supplier</th><th>Assigned factory</th><th>Signup time</th><th><span class="sr-only">Actions</span></th></tr></thead>
+            <thead><tr><th>Signup date</th><th>Name</th><th>Email</th><th id="entity-heading">Supplier</th><th id="linked-heading">Factories</th><th><span class="sr-only">Actions</span></th></tr></thead>
             <tbody id="registrations-body"></tbody>
           </table>
         </div>
         <p id="table-message" class="table-message" role="status">Loading registrations...</p>
       </section>
+      <p id="table-footnote" class="table-footnote"></p>
     </main>
+    <footer class="page-footer page-footer-wide"><p>&copy; <span id="year"></span> PAC-D · Carton Connect</p></footer>
   </div>
 
   <dialog id="edit-dialog" class="admin-dialog">
     <form id="edit-form" novalidate>
-      <div class="dialog-heading"><h2>Edit registration</h2><button class="icon-button" type="button" data-close-dialog="edit-dialog" aria-label="Close">&times;</button></div>
-      <input id="edit-id" type="hidden"><input id="edit-type" type="hidden">
+      <div class="dialog-heading"><h2 id="edit-title">Edit registration</h2><button class="icon-button" type="button" data-close-dialog="edit-dialog" aria-label="Close">&times;</button></div>
       <div class="edit-grid">
         <div class="field"><label for="edit-name">Name</label><input id="edit-name" type="text" maxlength="120" required></div>
         <div class="field"><label for="edit-email">Email</label><input id="edit-email" type="email" maxlength="254" required></div>
-        <div id="supplier-edit-fields" class="field field-full">
-          <label for="edit-supplier-search">Supplier</label>
-          <div id="edit-supplier-combobox" class="combobox">
+        <div class="field field-full">
+          <label for="edit-primary-search" id="edit-primary-label">Supplier</label>
+          <div id="edit-primary-combobox" class="combobox">
             <div class="combo-control">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-4.4-4.4a8 8 0 1 0-1.4 1.4l4.4 4.4L21 20ZM5 11a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z"/></svg>
-              <input id="edit-supplier-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="edit-supplier-options" placeholder="Search and select a supplier" autocomplete="off">
+              <input id="edit-primary-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="edit-primary-options" placeholder="Search and select" autocomplete="off">
               <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5 1.5 1.5-6.5 6.5L5.5 11 7 9.5Z"/></svg>
             </div>
-            <div id="edit-supplier-options" class="options-panel" role="listbox" hidden></div>
+            <div id="edit-primary-options" class="options-panel" role="listbox" hidden></div>
           </div>
 
           <div class="factory-edit-field">
-            <div class="edit-label-row"><label for="edit-factory-search">Assigned factories</label><span id="edit-factory-count" class="selection-count"></span></div>
-            <div id="edit-factory-multiselect" class="multi-select">
+            <div class="edit-label-row"><label for="edit-linked-search" id="edit-linked-label">Factories</label><span id="edit-linked-count" class="selection-count"></span></div>
+            <div id="edit-linked-multiselect" class="multi-select">
               <div class="combo-control">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-4.4-4.4a8 8 0 1 0-1.4 1.4l4.4 4.4L21 20ZM5 11a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z"/></svg>
-                <input id="edit-factory-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="edit-factory-options" placeholder="Search and select factories" autocomplete="off">
+                <input id="edit-linked-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="edit-linked-options" placeholder="Search and select" autocomplete="off">
                 <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5 1.5 1.5-6.5 6.5L5.5 11 7 9.5Z"/></svg>
               </div>
-              <div id="edit-factory-options" class="options-panel" hidden></div>
-              <div id="edit-selected-factories" class="selected-chips"></div>
+              <div id="edit-linked-options" class="options-panel" hidden></div>
+              <div id="edit-linked-chips" class="picked-list"></div>
             </div>
           </div>
-        </div>
-        <div id="packaging-edit-fields" class="field field-full" hidden>
-          <label for="edit-packaging-supplier">Packaging supplier</label>
-          <select id="edit-packaging-supplier"><option>Epyllion Ltd.</option><option>MR Box</option><option>Reflex Packaging Ltd.</option><option>Uniglory Packaging Industries Ltd.</option><option>Union Label &amp; Accessories Ltd.</option><option>Youngshine Packtrims Ltd.</option></select>
         </div>
       </div>
       <p id="edit-status" class="inline-status" role="status"></p>
@@ -99,6 +126,8 @@
   </dialog>
   <script src="../data/supplier-factories.js"></script>
   <script src="../supabase-config.js"></script>
+  <script src="../multiselect.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
   <script src="dashboard.js"></script>
 </body>
 </html>

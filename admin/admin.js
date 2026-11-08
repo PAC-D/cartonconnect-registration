@@ -32,6 +32,7 @@
   }
 
   const openDashboard = () => window.location.replace("../admin-dashboard/");
+  document.querySelector("#year").textContent = new Date().getFullYear();
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();

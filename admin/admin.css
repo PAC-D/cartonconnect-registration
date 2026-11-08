@@ -1,13 +1,16 @@
-.admin-body { background: var(--background); }
-.login-main { width: min(100% - 32px, 380px); min-height: calc(100vh - 95px); display: grid; place-items: center; margin: 0 auto; padding: 32px 0; }
-.login-card { width: 100%; border: 1px solid #e1e8f0; border-radius: 12px; padding: 30px; background: #fff; box-shadow: 0 12px 34px rgba(0, 43, 92, 0.08); }
-.login-card h2 { margin: 2px 0 25px; color: var(--navy-deep); font-size: 1.65rem; }
-.login-card .submit-button { margin-top: 10px; }
+.login-main { display: grid; place-items: center; flex: 1; padding: 32px 0 64px; }
+.login-card { width: min(100%, 400px); }
+.login-card h2 { margin: 0; color: var(--text); font-size: 24px; font-weight: 600; line-height: 1.25; }
+.login-text { margin: 4px 0 24px; color: var(--text-2); font-size: 14px; }
+.login-card .submit-button { margin-top: 8px; }
 .password-control { position: relative; }
-.password-control input { width: 100%; height: 48px; border: 1px solid #cbd6e3; border-radius: 9px; padding: 0 46px 0 14px; color: var(--ink); background: #fff; outline: 0; }
-.password-control input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0, 169, 224, 0.12); }
-.password-control button { position: absolute; inset: 0 5px 0 auto; display: grid; place-items: center; width: 38px; border: 0; padding: 0; color: #617086; background: transparent; }
-.password-control button:hover, .password-control button:focus-visible { color: var(--navy); outline: 2px solid rgba(0, 169, 224, 0.2); outline-offset: -5px; border-radius: 8px; }
-.password-control svg { display: block; width: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.password-control input { width: 100%; height: 44px; border: 1px solid var(--border-strong); border-radius: 8px; padding: 0 48px 0 12px; color: var(--text); background: var(--surface); font-size: 15px; outline: 0; transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease); }
+.password-control input:hover { border-color: var(--text-3); }
+.password-control input:focus { border-color: #0284c7; box-shadow: var(--focus); }
+.password-control button { position: absolute; top: 4px; right: 4px; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 6px; padding: 0; color: var(--text-3); background: transparent; }
+.password-control button:hover { color: var(--text); background: var(--muted); }
+.password-control button:focus-visible { outline: none; box-shadow: var(--focus); }
+.password-control svg { display: block; width: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .password-control svg.is-hidden { display: none !important; }
-.login-card .field-error { min-height: 20px; line-height: 1.4; }
+.login-card .field-error { min-height: 20px; }
+.login-main + .page-footer { max-width: 400px; }

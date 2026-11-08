@@ -2,50 +2,82 @@
   "use strict";
 
   const suppliers = Array.isArray(window.SUPPLIER_FACTORY_DATA) ? window.SUPPLIER_FACTORY_DATA : [];
-  const factoryIndex = new Map();
-  suppliers.forEach((supplier) => supplier.factories.forEach((factory) => {
-    if (!factoryIndex.has(factory.code)) factoryIndex.set(factory.code, { ...factory, suppliers: [] });
-    factoryIndex.get(factory.code).suppliers.push({ code: supplier.code, name: supplier.name });
-  }));
-  const factories = [...factoryIndex.values()].sort((a, b) => a.name.localeCompare(b.name));
-  const state = { supplier: null, selectedFactories: new Map(), registrationFactory: null, allocatedSupplier: null };
-  const form = document.querySelector("#registration-form");
-  const supplierInput = document.querySelector("#supplier-search");
-  const supplierPanel = document.querySelector("#supplier-options");
-  const clearSupplierButton = document.querySelector("#clear-supplier");
-  const factoryInput = document.querySelector("#factory-search");
-  const factoryPanel = document.querySelector("#factory-options");
-  const factoryControl = document.querySelector("#factory-multiselect");
-  const chips = document.querySelector("#selected-factories");
-  const factoryCount = document.querySelector("#factory-count");
-  const submitButton = form.querySelector(".submit-button");
-  const status = document.querySelector("#form-status");
-  const factoryForm = document.querySelector("#factory-registration-form");
-  const registrationFactoryInput = document.querySelector("#factory-registration-search");
-  const registrationFactoryPanel = document.querySelector("#factory-registration-options");
-  const clearRegistrationFactoryButton = document.querySelector("#clear-registration-factory");
-  const allocatedSupplierInput = document.querySelector("#allocated-supplier-search");
-  const allocatedSupplierPanel = document.querySelector("#allocated-supplier-options");
-  const allocatedSupplierControl = document.querySelector("#allocated-supplier-combobox");
-  const clearAllocatedSupplierButton = document.querySelector("#clear-allocated-supplier");
-  const factoryName = document.querySelector("#factory-name");
-  const factoryEmail = document.querySelector("#factory-email");
-  const factoryStatus = document.querySelector("#factory-form-status");
-  const factorySubmitButton = factoryForm.querySelector(".submit-button");
-  const packagingForm = document.querySelector("#packaging-registration-form");
-  const packagingSupplier = document.querySelector("#packaging-supplier");
-  const packagingName = document.querySelector("#packaging-name");
-  const packagingEmail = document.querySelector("#packaging-email");
-  const packagingStatus = document.querySelector("#packaging-form-status");
-  const packagingSubmitButton = packagingForm.querySelector(".submit-button");
-  const typeDialog = document.querySelector("#registration-type-dialog");
-  const pageStepLabel = document.querySelector("#page-step-label");
-  const registrationHeading = document.querySelector("#registration-heading");
+  const factoryList = Array.isArray(window.FACTORY_LIST) ? window.FACTORY_LIST : [];
+  const packagingFactories = window.PACKAGING_FACTORIES || {};
 
-  document.querySelector("#year").textContent = new Date().getFullYear();
+  // Every packaging-assigned factory, with the garment suppliers allocated to it (may be none).
+  const suppliersByFactory = new Map();
+  suppliers.forEach((supplier) => supplier.factories.forEach((factory) => {
+    if (!suppliersByFactory.has(factory.code)) suppliersByFactory.set(factory.code, []);
+    suppliersByFactory.get(factory.code).push({ code: supplier.code, name: supplier.name });
+  }));
+  const factories = factoryList.map((factory) => ({ ...factory, suppliers: suppliersByFactory.get(factory.code) || [] }));
+  const factoryByCode = new Map(factories.map((factory) => [factory.code, factory]));
+
+  const $ = (selector) => document.querySelector(selector);
+  const state = { supplier: null, registrationFactory: null };
+
+  const form = $("#registration-form");
+  const supplierInput = $("#supplier-search");
+  const supplierPanel = $("#supplier-options");
+  const clearSupplierButton = $("#clear-supplier");
+  const fullName = $("#full-name");
+  const email = $("#email");
+  const status = $("#form-status");
+
+  const factoryForm = $("#factory-registration-form");
+  const registrationFactoryInput = $("#factory-registration-search");
+  const registrationFactoryPanel = $("#factory-registration-options");
+  const clearRegistrationFactoryButton = $("#clear-registration-factory");
+  const noSuppliersNote = $("#no-suppliers-note");
+  const factoryName = $("#factory-name");
+  const factoryEmail = $("#factory-email");
+  const factoryStatus = $("#factory-form-status");
+
+  const packagingForm = $("#packaging-registration-form");
+  const packagingSupplier = $("#packaging-supplier");
+  const packagingName = $("#packaging-name");
+  const packagingEmail = $("#packaging-email");
+  const packagingStatus = $("#packaging-form-status");
+
+  const typeRadios = [...document.querySelectorAll('input[name="registration-type"]')];
+  const typeHint = $("#type-hint");
+  const steps = [...document.querySelectorAll(".steps li")];
+
+  $("#year").textContent = new Date().getFullYear();
+
+  const factoryPicker = createMultiSelect({
+    root: $("#factory-multiselect"), input: $("#factory-search"), panel: $("#factory-options"),
+    chips: $("#selected-factories"), count: $("#factory-count"), codeLabel: "Factory code",
+    noun: ["factory", "factories"], emptyMessage: "No assigned factories found",
+    placeholder: "Search factories", disabledPlaceholder: "Select a supplier first",
+    onChange: () => setFieldError($("#factory-search"), "factory-error", "")
+  });
+  const allocatedSupplierPicker = createMultiSelect({
+    root: $("#allocated-supplier-multiselect"), input: $("#allocated-supplier-search"), panel: $("#allocated-supplier-options"),
+    chips: $("#selected-suppliers"), count: $("#allocated-supplier-count"), codeLabel: "Supplier code",
+    noun: ["supplier", "suppliers"], emptyMessage: "No allocated suppliers found",
+    placeholder: "Search suppliers", disabledPlaceholder: "Select a factory first",
+    onChange: () => setFieldError($("#allocated-supplier-search"), "allocated-supplier-error", "")
+  });
+  const packagingFactoryPicker = createMultiSelect({
+    root: $("#packaging-factory-multiselect"), input: $("#packaging-factory-search"), panel: $("#packaging-factory-options"),
+    chips: $("#packaging-selected-factories"), count: $("#packaging-factory-count"), codeLabel: "Factory code",
+    noun: ["factory", "factories"], emptyMessage: "No assigned factories found",
+    placeholder: "Search factories", disabledPlaceholder: "Select a packaging supplier first",
+    onChange: () => setFieldError($("#packaging-factory-search"), "packaging-factory-error", "")
+  });
 
   const normalise = (value) => value.toLocaleLowerCase().trim();
   const includesQuery = (item, query) => normalise(`${item.name} ${item.code}`).includes(normalise(query));
+
+  // An empty message clears the error.
+  function setFieldError(input, errorId, message) {
+    $(`#${errorId}`).textContent = message;
+    (input.closest(".combo-control") || input).classList.toggle("has-error", Boolean(message));
+    if (message) input.setAttribute("aria-invalid", "true");
+    else input.removeAttribute("aria-invalid");
+  }
 
   function setPanel(input, panel, open) {
     panel.hidden = !open;
@@ -69,16 +101,43 @@
       button.role = "option";
       button.setAttribute("aria-selected", String(selectedCode === item.code));
       const text = document.createElement("span");
+      text.className = "item-name";
       text.textContent = item.name;
-      const code = document.createElement("small");
-      code.textContent = `${codeLabel}: ${item.code}`;
-      text.append(code);
-      button.append(text);
+      const code = document.createElement("span");
+      code.className = "code";
+      code.title = codeLabel;
+      code.textContent = item.code;
+      button.append(text, code);
       button.addEventListener("click", () => onSelect(item));
       panel.append(button);
     });
   }
 
+  // Supplier registration: one supplier, many of its factories.
+  function renderSuppliers(query = "") {
+    renderSingleSelect(supplierPanel, suppliers, query, state.supplier?.code, "No suppliers found", "Supplier code", selectSupplier);
+  }
+
+  function selectSupplier(supplier) {
+    const changed = state.supplier?.code !== supplier.code;
+    state.supplier = supplier;
+    supplierInput.value = supplier.name;
+    clearSupplierButton.hidden = false;
+    setPanel(supplierInput, supplierPanel, false);
+    setFieldError(supplierInput, "supplier-error", "");
+    if (changed) factoryPicker.setItems(supplier.factories);
+  }
+
+  function clearSupplier(focus = true) {
+    state.supplier = null;
+    supplierInput.value = "";
+    clearSupplierButton.hidden = true;
+    setPanel(supplierInput, supplierPanel, false);
+    factoryPicker.setItems([]);
+    if (focus) supplierInput.focus();
+  }
+
+  // Factory registration: one factory, many of its allocated suppliers.
   function renderRegistrationFactories(query = "") {
     renderSingleSelect(registrationFactoryPanel, factories, query, state.registrationFactory?.code,
       "No factories found", "Factory code", selectRegistrationFactory);
@@ -90,293 +149,67 @@
     registrationFactoryInput.value = factory.name;
     clearRegistrationFactoryButton.hidden = false;
     setPanel(registrationFactoryInput, registrationFactoryPanel, false);
-    clearFactoryRegistrationError("registration");
-    if (changed) clearAllocatedSupplier(false);
-    allocatedSupplierInput.disabled = false;
-    allocatedSupplierInput.placeholder = "Search and select an allocated supplier";
-    allocatedSupplierControl.classList.remove("is-disabled");
-    renderAllocatedSuppliers();
+    setFieldError(registrationFactoryInput, "factory-registration-error", "");
+    noSuppliersNote.hidden = factory.suppliers.length > 0;
+    if (changed) allocatedSupplierPicker.setItems(factory.suppliers);
+    if (!factory.suppliers.length) allocatedSupplierPicker.input.placeholder = "No assigned suppliers";
   }
 
-  function clearRegistrationFactory() {
+  function clearRegistrationFactory(focus = true) {
     state.registrationFactory = null;
     registrationFactoryInput.value = "";
     clearRegistrationFactoryButton.hidden = true;
+    noSuppliersNote.hidden = true;
     setPanel(registrationFactoryInput, registrationFactoryPanel, false);
-    clearAllocatedSupplier(false);
-    allocatedSupplierInput.disabled = true;
-    allocatedSupplierInput.placeholder = "Select a factory first";
-    allocatedSupplierControl.classList.add("is-disabled");
-    registrationFactoryInput.focus();
+    allocatedSupplierPicker.setItems([]);
+    if (focus) registrationFactoryInput.focus();
   }
 
-  function renderAllocatedSuppliers(query = "") {
-    const allocated = state.registrationFactory?.suppliers || [];
-    renderSingleSelect(allocatedSupplierPanel, allocated, query, state.allocatedSupplier?.code,
-      "No allocated suppliers found", "Supplier code", selectAllocatedSupplier);
-  }
-
-  function selectAllocatedSupplier(supplier) {
-    state.allocatedSupplier = supplier;
-    allocatedSupplierInput.value = supplier.name;
-    clearAllocatedSupplierButton.hidden = false;
-    setPanel(allocatedSupplierInput, allocatedSupplierPanel, false);
-    clearFactoryRegistrationError("supplier");
-  }
-
-  function clearAllocatedSupplier(focus = true) {
-    state.allocatedSupplier = null;
-    allocatedSupplierInput.value = "";
-    clearAllocatedSupplierButton.hidden = true;
-    setPanel(allocatedSupplierInput, allocatedSupplierPanel, false);
-    if (focus && !allocatedSupplierInput.disabled) allocatedSupplierInput.focus();
-  }
-
-  function renderSuppliers(query = "") {
-    const matches = suppliers.filter((supplier) => includesQuery(supplier, query));
-    supplierPanel.replaceChildren();
-
-    if (!matches.length) {
-      const empty = document.createElement("div");
-      empty.className = "empty-option";
-      empty.textContent = "No suppliers found";
-      supplierPanel.append(empty);
-      return;
-    }
-
-    matches.forEach((supplier) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "option";
-      button.role = "option";
-      button.setAttribute("aria-selected", String(state.supplier?.code === supplier.code));
-      const text = document.createElement("span");
-      text.textContent = supplier.name;
-      const code = document.createElement("small");
-      code.textContent = `Supplier code: ${supplier.code}`;
-      text.append(code);
-      button.append(text);
-      button.addEventListener("click", () => selectSupplier(supplier));
-      supplierPanel.append(button);
-    });
-  }
-
-  function selectSupplier(supplier) {
-    const changed = state.supplier?.code !== supplier.code;
-    state.supplier = supplier;
-    supplierInput.value = supplier.name;
-    supplierInput.dataset.code = supplier.code;
-    clearSupplierButton.hidden = false;
-    setPanel(supplierInput, supplierPanel, false);
-    clearError("supplier");
-
-    factoryInput.disabled = false;
-    factoryInput.placeholder = "Search and select factories";
-    factoryControl.classList.remove("is-disabled");
-    if (changed) state.selectedFactories.clear();
-    factoryInput.value = "";
-    renderFactories();
-    renderChips();
-  }
-
-  function clearSupplier() {
-    state.supplier = null;
-    state.selectedFactories.clear();
-    supplierInput.value = "";
-    delete supplierInput.dataset.code;
-    clearSupplierButton.hidden = true;
-    factoryInput.value = "";
-    factoryInput.disabled = true;
-    factoryInput.placeholder = "Select a supplier first";
-    factoryControl.classList.add("is-disabled");
-    setPanel(supplierInput, supplierPanel, false);
-    setPanel(factoryInput, factoryPanel, false);
-    renderChips();
-    supplierInput.focus();
-  }
-
-  function clearFactorySelection() {
-    state.selectedFactories.clear();
-    factoryInput.value = "";
-    factoryInput.disabled = true;
-    factoryInput.placeholder = "Select a supplier first";
-    factoryControl.classList.add("is-disabled");
-    setPanel(factoryInput, factoryPanel, false);
-    renderChips();
-  }
-
-  function renderFactories(query = "") {
-    factoryPanel.replaceChildren();
-    if (!state.supplier) return;
-    const matches = state.supplier.factories.filter((factory) => includesQuery(factory, query));
-
-    const list = document.createElement("div");
-    list.className = "options-list";
-    list.role = "listbox";
-    list.setAttribute("aria-label", "Assigned factories");
-    list.setAttribute("aria-multiselectable", "true");
-
-    if (!matches.length) {
-      const empty = document.createElement("div");
-      empty.className = "empty-option";
-      empty.textContent = "No assigned factories found";
-      list.append(empty);
-    }
-
-    matches.forEach((factory) => {
-      const selected = state.selectedFactories.has(factory.code);
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "option";
-      button.role = "option";
-      button.dataset.factoryCode = factory.code;
-      button.setAttribute("aria-selected", String(selected));
-      const checkbox = document.createElement("span");
-      checkbox.className = "option-check";
-      checkbox.textContent = selected ? "✓" : "";
-      const text = document.createElement("span");
-      text.textContent = factory.name;
-      const code = document.createElement("small");
-      code.textContent = `Factory code: ${factory.code}`;
-      text.append(code);
-      button.append(checkbox, text);
-      button.addEventListener("click", () => toggleFactory(factory, button));
-      list.append(button);
-    });
-
-    const actions = document.createElement("div");
-    actions.className = "options-actions";
-    const summary = document.createElement("span");
-    const selectedCount = state.selectedFactories.size;
-    summary.textContent = `${selectedCount} ${selectedCount === 1 ? "factory" : "factories"} selected`;
-    const done = document.createElement("button");
-    done.type = "button";
-    done.className = "done-button";
-    done.textContent = "Done";
-    done.addEventListener("click", () => {
-      factoryInput.value = "";
-      setPanel(factoryInput, factoryPanel, false);
-      document.querySelector("#full-name").focus();
-    });
-    actions.append(summary, done);
-    factoryPanel.append(list, actions);
-  }
-
-  function toggleFactory(factory, sourceButton) {
-    if (state.selectedFactories.has(factory.code)) state.selectedFactories.delete(factory.code);
-    else state.selectedFactories.set(factory.code, factory);
-    clearError("factory");
-    renderFactories(factoryInput.value);
-    renderChips();
-    if (sourceButton) {
-      factoryPanel.querySelector(`[data-factory-code="${factory.code}"]`)?.focus();
-    }
-  }
-
-  function renderChips() {
-    chips.replaceChildren();
-    const selected = [...state.selectedFactories.values()];
-    factoryCount.textContent = selected.length ? `${selected.length} selected` : "";
-
-    selected.forEach((factory) => {
-      const chip = document.createElement("span");
-      chip.className = "chip";
-      const name = document.createElement("span");
-      name.textContent = factory.name;
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.setAttribute("aria-label", `Remove ${factory.name}`);
-      remove.textContent = "×";
-      remove.addEventListener("click", () => toggleFactory(factory));
-      chip.append(name, remove);
-      chips.append(chip);
-    });
-  }
-
-  function showError(field, message) {
-    const error = document.querySelector(`#${field}-error`);
-    const input = field === "supplier" ? supplierInput
-      : field === "factory" ? factoryInput
-      : document.querySelector(`#${field === "name" ? "full-name" : field}`);
-    const control = input.closest(".combo-control") || input;
-    error.textContent = message;
-    control.classList.add("has-error");
-    input.setAttribute("aria-invalid", "true");
-  }
-
-  function clearError(field) {
-    const error = document.querySelector(`#${field}-error`);
-    const input = field === "supplier" ? supplierInput
-      : field === "factory" ? factoryInput
-      : document.querySelector(`#${field === "name" ? "full-name" : field}`);
-    const control = input.closest(".combo-control") || input;
-    error.textContent = "";
-    control.classList.remove("has-error");
-    input.removeAttribute("aria-invalid");
+  function validEmail(input) {
+    return Boolean(input.value.trim()) && input.checkValidity();
   }
 
   function validate() {
-    ["supplier", "factory", "name", "email"].forEach(clearError);
-    const name = document.querySelector("#full-name").value.trim();
-    const emailInput = document.querySelector("#email");
-    const email = emailInput.value.trim();
     let valid = true;
-
-    if (!state.supplier) { showError("supplier", "Please select a supplier."); valid = false; }
-    if (!state.selectedFactories.size) { showError("factory", "Select at least one factory."); valid = false; }
-    if (name.length < 2) { showError("name", "Please enter your full name."); valid = false; }
-    if (!email || !emailInput.checkValidity()) { showError("email", "Enter a valid email address."); valid = false; }
-    return valid;
-  }
-
-  function registrationPayload() {
-    return {
-      registration_type: "Supplier",
-      supplier_code: state.supplier.code,
-      supplier_name: state.supplier.name,
-      factories: [...state.selectedFactories.values()].map(({ code, name }) => ({ code, name })),
-      full_name: document.querySelector("#full-name").value.trim(),
-      email: document.querySelector("#email").value.trim().toLocaleLowerCase()
+    const check = (input, errorId, ok, message) => {
+      setFieldError(input, errorId, ok ? "" : message);
+      if (!ok) valid = false;
     };
-  }
-
-  function clearFactoryRegistrationError(field) {
-    const input = field === "registration" ? registrationFactoryInput
-      : field === "supplier" ? allocatedSupplierInput
-      : field === "name" ? factoryName : factoryEmail;
-    document.querySelector(`#${field === "registration" ? "factory-registration" : field === "supplier" ? "allocated-supplier" : `factory-${field}`}-error`).textContent = "";
-    (input.closest(".combo-control") || input).classList.remove("has-error");
-    input.removeAttribute("aria-invalid");
-  }
-
-  function showFactoryRegistrationError(field, message) {
-    const input = field === "registration" ? registrationFactoryInput
-      : field === "supplier" ? allocatedSupplierInput
-      : field === "name" ? factoryName : factoryEmail;
-    document.querySelector(`#${field === "registration" ? "factory-registration" : field === "supplier" ? "allocated-supplier" : `factory-${field}`}-error`).textContent = message;
-    (input.closest(".combo-control") || input).classList.add("has-error");
-    input.setAttribute("aria-invalid", "true");
+    check(supplierInput, "supplier-error", state.supplier, "Please select a supplier.");
+    check($("#factory-search"), "factory-error", factoryPicker.size(), "Select at least one factory.");
+    check(fullName, "name-error", fullName.value.trim().length >= 2, "Please enter your full name.");
+    check(email, "email-error", validEmail(email), "Enter a valid email address.");
+    return valid;
   }
 
   function validateFactoryForm() {
-    ["registration", "supplier", "name", "email"].forEach(clearFactoryRegistrationError);
     let valid = true;
-    if (!state.registrationFactory) { showFactoryRegistrationError("registration", "Please select a factory."); valid = false; }
-    if (!state.allocatedSupplier) { showFactoryRegistrationError("supplier", "Please select an allocated supplier."); valid = false; }
-    if (factoryName.value.trim().length < 2) { showFactoryRegistrationError("name", "Please enter your full name."); valid = false; }
-    if (!factoryEmail.value.trim() || !factoryEmail.checkValidity()) { showFactoryRegistrationError("email", "Enter a valid email address."); valid = false; }
+    const check = (input, errorId, ok, message) => {
+      setFieldError(input, errorId, ok ? "" : message);
+      if (!ok) valid = false;
+    };
+    check(registrationFactoryInput, "factory-registration-error", state.registrationFactory, "Please select a factory.");
+    if (state.registrationFactory && !state.registrationFactory.suppliers.length) {
+      valid = false; // the no-suppliers note already explains what to do
+    } else {
+      check($("#allocated-supplier-search"), "allocated-supplier-error", allocatedSupplierPicker.size(), "Select at least one supplier.");
+    }
+    check(factoryName, "factory-name-error", factoryName.value.trim().length >= 2, "Please enter your full name.");
+    check(factoryEmail, "factory-email-error", validEmail(factoryEmail), "Enter a valid email address.");
     return valid;
   }
 
-  function factoryRegistrationPayload() {
-    return {
-      registration_type: "Factory",
-      supplier_code: state.allocatedSupplier.code,
-      supplier_name: state.allocatedSupplier.name,
-      factories: [{ code: state.registrationFactory.code, name: state.registrationFactory.name }],
-      full_name: factoryName.value.trim(),
-      email: factoryEmail.value.trim().toLocaleLowerCase()
+  function validatePackagingForm() {
+    let valid = true;
+    const check = (input, errorId, ok, message) => {
+      setFieldError(input, errorId, ok ? "" : message);
+      if (!ok) valid = false;
     };
+    check(packagingSupplier, "packaging-supplier-error", packagingSupplier.value, "Please select a packaging supplier.");
+    check($("#packaging-factory-search"), "packaging-factory-error", packagingFactoryPicker.size(), "Select at least one factory.");
+    check(packagingName, "packaging-name-error", packagingName.value.trim().length >= 2, "Please enter your full name.");
+    check(packagingEmail, "packaging-email-error", validEmail(packagingEmail), "Enter a valid email address.");
+    return valid;
   }
 
   async function saveRegistration(payload, table = "registrations") {
@@ -399,56 +232,56 @@
 
     if (!response.ok) {
       let detail = "The registration could not be saved.";
-      try { detail = (await response.json()).message || detail; } catch (_) { /* non-JSON error */ }
+      try {
+        const body = await response.json();
+        detail = body.code === "23505" ? "This email is already registered for that selection." : body.message || detail;
+      } catch (_) { /* non-JSON error */ }
       throw new Error(detail);
     }
     return { demo: false };
   }
 
-  function resetForm() {
-    form.reset();
-    state.supplier = null;
-    state.selectedFactories.clear();
-    clearSupplierButton.hidden = true;
-    factoryInput.disabled = true;
-    factoryInput.placeholder = "Select a supplier first";
-    factoryControl.classList.add("is-disabled");
-    renderChips();
-  }
-
-  function resetFactoryForm() {
-    factoryForm.reset();
-    state.registrationFactory = null;
-    state.allocatedSupplier = null;
-    clearRegistrationFactoryButton.hidden = true;
-    clearAllocatedSupplierButton.hidden = true;
-    allocatedSupplierInput.disabled = true;
-    allocatedSupplierInput.placeholder = "Select a factory first";
-    allocatedSupplierControl.classList.add("is-disabled");
-  }
-
   function showTypeSelection() {
-    if (!typeDialog.open) typeDialog.showModal();
+    $("#type-section").scrollIntoView({ behavior: "smooth", block: "start" });
+    (typeRadios.find((radio) => radio.checked) || typeRadios[0]).focus({ preventScroll: true });
   }
+
+  const activeType = () => typeRadios.find((radio) => radio.checked)?.value;
+  const typeLabels = { supplier: "Supplier", factory: "Factory", packaging: "Packaging supplier" };
+  const allocationLabels = { supplier: "Supplier and its factories", factory: "Factory and its suppliers", packaging: "Packaging supplier and its factories" };
 
   function selectRegistrationType(type) {
-    const packaging = type === "packaging";
-    const factory = type === "factory";
-    form.hidden = packaging || factory;
-    factoryForm.hidden = !factory;
-    packagingForm.hidden = !packaging;
-    status.hidden = true;
-    status.className = "form-status";
-    packagingStatus.hidden = true;
-    packagingStatus.className = "form-status";
-    factoryStatus.hidden = true;
-    factoryStatus.className = "form-status";
-    pageStepLabel.textContent = packaging ? "Packaging supplier registration" : factory ? "Factory registration" : "Supplier registration";
-    registrationHeading.textContent = packaging
-      ? "Create your packaging supplier access request"
-      : factory ? "Create your factory access request" : "Create your supplier access request";
-    typeDialog.close();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    form.hidden = type !== "supplier";
+    factoryForm.hidden = type !== "factory";
+    packagingForm.hidden = type !== "packaging";
+    typeHint.hidden = true;
+    [status, factoryStatus, packagingStatus].forEach((target) => { target.hidden = true; target.className = "form-status"; });
+    $("#step-type-detail").textContent = typeLabels[type];
+    $("#step-allocations-detail").textContent = allocationLabels[type];
+    updateProgress();
+  }
+
+  // Left-rail steps: done when that part of the active form is complete; the first open one is current.
+  function updateProgress() {
+    const type = activeType();
+    const details = { supplier: [fullName, email], factory: [factoryName, factoryEmail], packaging: [packagingName, packagingEmail] }[type];
+    const done = {
+      type: Boolean(type),
+      allocations: type === "supplier" ? Boolean(state.supplier && factoryPicker.size())
+        : type === "factory" ? Boolean(state.registrationFactory && allocatedSupplierPicker.size())
+        : type === "packaging" ? Boolean(packagingSupplier.value && packagingFactoryPicker.size()) : false,
+      details: Boolean(details && details[0].value.trim().length >= 2 && validEmail(details[1]))
+    };
+    let currentSet = false;
+    steps.forEach((step) => {
+      const isDone = done[step.dataset.step];
+      const isCurrent = !isDone && !currentSet;
+      if (isCurrent) currentSet = true;
+      step.classList.toggle("is-done", isDone);
+      step.classList.toggle("is-current", isCurrent);
+      if (isCurrent) step.setAttribute("aria-current", "step");
+      else step.removeAttribute("aria-current");
+    });
   }
 
   function showSuccess(target, message) {
@@ -457,193 +290,123 @@
     const returnButton = document.createElement("button");
     returnButton.type = "button";
     returnButton.className = "selection-return";
-    returnButton.textContent = "Choose another registration type";
+    returnButton.textContent = "Register another";
     returnButton.addEventListener("click", showTypeSelection);
     target.replaceChildren(text, document.createElement("br"), returnButton);
     target.className = "form-status success";
     target.hidden = false;
   }
 
-  function clearPackagingError(field) {
-    const input = field === "supplier" ? packagingSupplier : field === "name" ? packagingName : packagingEmail;
-    document.querySelector(`#packaging-${field}-error`).textContent = "";
-    input.classList.remove("has-error");
-    input.removeAttribute("aria-invalid");
+  // Shared submit flow for all three forms.
+  function handleSubmit(targetForm, targetStatus, validator, buildPayload, table, successMessage, reset) {
+    const button = targetForm.querySelector(".submit-button");
+    targetForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      targetStatus.hidden = true;
+      targetStatus.className = "form-status";
+      if (!validator()) {
+        targetForm.querySelector("[aria-invalid='true']")?.focus();
+        return;
+      }
+      button.disabled = true;
+      button.querySelector("span").textContent = "Submitting…";
+      try {
+        const result = await saveRegistration(buildPayload(), table);
+        showSuccess(targetStatus, result.demo
+          ? "Registration validated in demo mode. Add your Supabase credentials to save submissions."
+          : successMessage);
+        reset();
+        updateProgress();
+      } catch (error) {
+        targetStatus.classList.add("error");
+        targetStatus.textContent = error.message || "Something went wrong. Please try again.";
+        targetStatus.hidden = false;
+      } finally {
+        button.disabled = false;
+        button.querySelector("span").textContent = "Submit registration";
+      }
+    });
   }
 
-  function showPackagingError(field, message) {
-    const input = field === "supplier" ? packagingSupplier : field === "name" ? packagingName : packagingEmail;
-    document.querySelector(`#packaging-${field}-error`).textContent = message;
-    input.classList.add("has-error");
-    input.setAttribute("aria-invalid", "true");
-  }
+  handleSubmit(form, status, validate, () => ({
+    registration_type: "Supplier",
+    supplier_code: state.supplier.code,
+    supplier_name: state.supplier.name,
+    factories: factoryPicker.values(),
+    full_name: fullName.value.trim(),
+    email: email.value.trim().toLocaleLowerCase()
+  }), "registrations", "Thank you. Your registration has been submitted successfully.", () => {
+    form.reset();
+    clearSupplier(false);
+  });
 
-  function validatePackagingForm() {
-    ["supplier", "name", "email"].forEach(clearPackagingError);
-    let valid = true;
-    if (!packagingSupplier.value) { showPackagingError("supplier", "Please select a packaging supplier."); valid = false; }
-    if (packagingName.value.trim().length < 2) { showPackagingError("name", "Please enter your full name."); valid = false; }
-    if (!packagingEmail.value.trim() || !packagingEmail.checkValidity()) { showPackagingError("email", "Enter a valid email address."); valid = false; }
-    return valid;
-  }
+  handleSubmit(factoryForm, factoryStatus, validateFactoryForm, () => ({
+    registration_type: "Factory",
+    factories: [{ code: state.registrationFactory.code, name: state.registrationFactory.name }],
+    suppliers: allocatedSupplierPicker.values(),
+    full_name: factoryName.value.trim(),
+    email: factoryEmail.value.trim().toLocaleLowerCase()
+  }), "registrations", "Thank you. Your factory registration has been submitted successfully.", () => {
+    factoryForm.reset();
+    clearRegistrationFactory(false);
+  });
+
+  handleSubmit(packagingForm, packagingStatus, validatePackagingForm, () => ({
+    packaging_supplier: packagingSupplier.value,
+    factories: packagingFactoryPicker.values(),
+    full_name: packagingName.value.trim(),
+    email: packagingEmail.value.trim().toLocaleLowerCase()
+  }), "packaging_registrations", "Thank you. Your packaging supplier registration has been submitted successfully.", () => {
+    packagingForm.reset();
+    packagingFactoryPicker.setItems([]);
+  });
 
   supplierInput.addEventListener("focus", () => { renderSuppliers(state.supplier ? "" : supplierInput.value); setPanel(supplierInput, supplierPanel, true); });
   supplierInput.addEventListener("input", () => {
-    if (supplierInput.value !== state.supplier?.name) {
+    if (state.supplier && supplierInput.value !== state.supplier.name) {
       state.supplier = null;
-      delete supplierInput.dataset.code;
-      clearSupplierButton.hidden = !supplierInput.value;
-      clearFactorySelection();
+      factoryPicker.setItems([]);
     }
+    clearSupplierButton.hidden = !supplierInput.value;
     renderSuppliers(supplierInput.value);
     setPanel(supplierInput, supplierPanel, true);
   });
   supplierInput.addEventListener("keydown", (event) => { if (event.key === "Escape") setPanel(supplierInput, supplierPanel, false); });
-  clearSupplierButton.addEventListener("click", clearSupplier);
-
-  factoryInput.addEventListener("focus", () => { renderFactories(factoryInput.value); setPanel(factoryInput, factoryPanel, true); });
-  factoryInput.addEventListener("input", () => { renderFactories(factoryInput.value); setPanel(factoryInput, factoryPanel, true); });
-  factoryInput.addEventListener("keydown", (event) => { if (event.key === "Escape") setPanel(factoryInput, factoryPanel, false); });
-  factoryControl.addEventListener("click", (event) => event.stopPropagation());
+  clearSupplierButton.addEventListener("click", () => clearSupplier());
 
   registrationFactoryInput.addEventListener("focus", () => { renderRegistrationFactories(state.registrationFactory ? "" : registrationFactoryInput.value); setPanel(registrationFactoryInput, registrationFactoryPanel, true); });
   registrationFactoryInput.addEventListener("input", () => {
-    if (registrationFactoryInput.value !== state.registrationFactory?.name) {
+    if (state.registrationFactory && registrationFactoryInput.value !== state.registrationFactory.name) {
       state.registrationFactory = null;
-      clearRegistrationFactoryButton.hidden = !registrationFactoryInput.value;
-      clearAllocatedSupplier(false);
-      allocatedSupplierInput.disabled = true;
-      allocatedSupplierInput.placeholder = "Select a factory first";
-      allocatedSupplierControl.classList.add("is-disabled");
+      noSuppliersNote.hidden = true;
+      allocatedSupplierPicker.setItems([]);
     }
+    clearRegistrationFactoryButton.hidden = !registrationFactoryInput.value;
     renderRegistrationFactories(registrationFactoryInput.value);
     setPanel(registrationFactoryInput, registrationFactoryPanel, true);
   });
   registrationFactoryInput.addEventListener("keydown", (event) => { if (event.key === "Escape") setPanel(registrationFactoryInput, registrationFactoryPanel, false); });
-  clearRegistrationFactoryButton.addEventListener("click", clearRegistrationFactory);
+  clearRegistrationFactoryButton.addEventListener("click", () => clearRegistrationFactory());
 
-  allocatedSupplierInput.addEventListener("focus", () => { if (state.registrationFactory) { renderAllocatedSuppliers(state.allocatedSupplier ? "" : allocatedSupplierInput.value); setPanel(allocatedSupplierInput, allocatedSupplierPanel, true); } });
-  allocatedSupplierInput.addEventListener("input", () => {
-    if (allocatedSupplierInput.value !== state.allocatedSupplier?.name) {
-      state.allocatedSupplier = null;
-      clearAllocatedSupplierButton.hidden = !allocatedSupplierInput.value;
-    }
-    renderAllocatedSuppliers(allocatedSupplierInput.value);
-    setPanel(allocatedSupplierInput, allocatedSupplierPanel, true);
+  packagingSupplier.addEventListener("change", () => {
+    setFieldError(packagingSupplier, "packaging-supplier-error", "");
+    const codes = packagingFactories[packagingSupplier.value] || [];
+    packagingFactoryPicker.setItems(codes.map((code) => factoryByCode.get(code)).filter(Boolean)
+      .sort((a, b) => a.name.localeCompare(b.name)));
   });
-  allocatedSupplierInput.addEventListener("keydown", (event) => { if (event.key === "Escape") setPanel(allocatedSupplierInput, allocatedSupplierPanel, false); });
-  clearAllocatedSupplierButton.addEventListener("click", () => clearAllocatedSupplier());
 
   document.addEventListener("click", (event) => {
     if (!event.target.closest("#supplier-combobox")) setPanel(supplierInput, supplierPanel, false);
-    if (!event.target.closest("#factory-multiselect")) setPanel(factoryInput, factoryPanel, false);
     if (!event.target.closest("#factory-registration-combobox")) setPanel(registrationFactoryInput, registrationFactoryPanel, false);
-    if (!event.target.closest("#allocated-supplier-combobox")) setPanel(allocatedSupplierInput, allocatedSupplierPanel, false);
   });
 
-  document.querySelector("#full-name").addEventListener("input", () => clearError("name"));
-  document.querySelector("#email").addEventListener("input", () => clearError("email"));
-  packagingSupplier.addEventListener("change", () => clearPackagingError("supplier"));
-  packagingName.addEventListener("input", () => clearPackagingError("name"));
-  packagingEmail.addEventListener("input", () => clearPackagingError("email"));
-  factoryName.addEventListener("input", () => clearFactoryRegistrationError("name"));
-  factoryEmail.addEventListener("input", () => clearFactoryRegistrationError("email"));
+  [[fullName, "name-error"], [email, "email-error"], [factoryName, "factory-name-error"], [factoryEmail, "factory-email-error"],
+    [packagingName, "packaging-name-error"], [packagingEmail, "packaging-email-error"]]
+    .forEach(([input, errorId]) => input.addEventListener("input", () => setFieldError(input, errorId, "")));
 
-  typeDialog.addEventListener("cancel", (event) => event.preventDefault());
-  document.querySelector("#choose-supplier").addEventListener("click", () => selectRegistrationType("supplier"));
-  document.querySelector("#choose-factory").addEventListener("click", () => selectRegistrationType("factory"));
-  document.querySelector("#choose-packaging").addEventListener("click", () => selectRegistrationType("packaging"));
-  document.querySelectorAll("[data-open-type-dialog]").forEach((button) => {
-    button.addEventListener("click", showTypeSelection);
-  });
+  typeRadios.forEach((radio) => radio.addEventListener("change", () => selectRegistrationType(radio.value)));
+  // Option clicks, typing and selects all bubble here after their own handlers have updated state.
+  ["click", "input", "change"].forEach((name) => document.addEventListener(name, updateProgress));
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    status.hidden = true;
-    status.className = "form-status";
-    if (!validate()) {
-      form.querySelector("[aria-invalid='true']")?.focus();
-      return;
-    }
-
-    submitButton.disabled = true;
-    submitButton.querySelector("span").textContent = "Submitting…";
-    try {
-      const result = await saveRegistration(registrationPayload());
-      showSuccess(status, result.demo
-        ? "Registration validated in demo mode. Add your Supabase credentials to save submissions."
-        : "Thank you. Your registration has been submitted successfully.");
-      resetForm();
-    } catch (error) {
-      status.classList.add("error");
-      status.textContent = error.message || "Something went wrong. Please try again.";
-      status.hidden = false;
-    } finally {
-      submitButton.disabled = false;
-      submitButton.querySelector("span").textContent = "Submit registration";
-    }
-  });
-
-  factoryForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    factoryStatus.hidden = true;
-    factoryStatus.className = "form-status";
-    if (!validateFactoryForm()) {
-      factoryForm.querySelector("[aria-invalid='true']")?.focus();
-      return;
-    }
-
-    factorySubmitButton.disabled = true;
-    factorySubmitButton.querySelector("span").textContent = "Submitting…";
-    try {
-      const result = await saveRegistration(factoryRegistrationPayload());
-      showSuccess(factoryStatus, result.demo
-        ? "Registration validated in demo mode. Add your Supabase credentials to save submissions."
-        : "Thank you. Your factory registration has been submitted successfully.");
-      resetFactoryForm();
-    } catch (error) {
-      factoryStatus.classList.add("error");
-      factoryStatus.textContent = error.message || "Something went wrong. Please try again.";
-      factoryStatus.hidden = false;
-    } finally {
-      factorySubmitButton.disabled = false;
-      factorySubmitButton.querySelector("span").textContent = "Submit registration";
-    }
-  });
-
-  packagingForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    packagingStatus.hidden = true;
-    packagingStatus.className = "form-status";
-    if (!validatePackagingForm()) {
-      packagingForm.querySelector("[aria-invalid='true']")?.focus();
-      return;
-    }
-
-    packagingSubmitButton.disabled = true;
-    packagingSubmitButton.querySelector("span").textContent = "Submitting…";
-    const payload = {
-      packaging_supplier: packagingSupplier.value,
-      full_name: packagingName.value.trim(),
-      email: packagingEmail.value.trim().toLocaleLowerCase()
-    };
-
-    try {
-      const result = await saveRegistration(payload, "packaging_registrations");
-      showSuccess(packagingStatus, result.demo
-        ? "Registration validated in demo mode. Add your Supabase credentials to save submissions."
-        : "Thank you. Your packaging supplier registration has been submitted successfully.");
-      packagingForm.reset();
-    } catch (error) {
-      packagingStatus.classList.add("error");
-      packagingStatus.textContent = error.message || "Something went wrong. Please try again.";
-      packagingStatus.hidden = false;
-    } finally {
-      packagingSubmitButton.disabled = false;
-      packagingSubmitButton.querySelector("span").textContent = "Submit registration";
-    }
-  });
-
-  renderSuppliers();
-  showTypeSelection();
+  updateProgress();
 })();

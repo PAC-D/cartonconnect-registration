@@ -1,15 +1,15 @@
-# CartonConnect
+# Carton Connect registration
 
-A responsive supplier registration portal for CartonConnect. It uses the PACD and Primark assets in `assets/`, filters factories in the browser using the mappings from `factory-supplier pair.xlsx`, and submits only completed registrations to Supabase.
+A responsive registration portal for Carton Connect, the PAC-D portal for the Primark carton supply timeline (cartonconnect.pac-d.com). Its look follows the Carton Connect portal. It uses the PACD and Primark assets in `assets/`, filters factories in the browser using the mappings from `factory-supplier pair.xlsx`, and submits only completed registrations to Supabase.
 
 ## What is included
 
 - Searchable supplier dropdown containing all 68 suppliers from the workbook
 - Supplier-dependent multi-select containing the assigned factories only
 - Required registration-type chooser for supplier, factory, or packaging supplier onboarding
-- Factory-first registration with a supplier list restricted to that factory's allocations
-- Packaging supplier registration with a controlled single-select supplier list
-- Compact `/admin` dashboard for reviewing all three registration types
+- Factory-first registration: one factory, multiple suppliers restricted to that factory's allocations. Factories without allocated suppliers show a contact message instead.
+- Packaging supplier registration: one packaging supplier, multiple factories from `assignments.xlsx` (factories shared between packaging suppliers appear for each; allocation % is ignored)
+- `/admin` dashboard with separate Supplier, Factory, and Packaging supplier sections, per-section analytics, and Excel export
 - Supplier and factory codes retained as stable identifiers
 - Responsive layout for mobile, tablet, laptop, and desktop
 - Accessible labels, keyboard-friendly controls, inline validation, and status messages
@@ -22,6 +22,7 @@ A responsive supplier registration portal for CartonConnect. It uses the PACD an
 ```text
 .
 ├── assets/
+│   ├── assignments.xlsx         # factory to packaging supplier allocations
 │   ├── factory-supplier pair.xlsx
 │   ├── favicon.png
 │   ├── pacd.png
@@ -31,6 +32,7 @@ A responsive supplier registration portal for CartonConnect. It uses the PACD an
 ├── scripts/
 │   └── generate-data.ps1        # reads the xlsx and rebuilds the mapping
 ├── app.js                       # dynamic controls, validation, submission
+├── multiselect.js               # shared searchable multi-select (form and admin)
 ├── index.html
 ├── styles.css
 ├── supabase-config.js           # public browser configuration
@@ -63,7 +65,7 @@ window.SUPABASE_CONFIG = {
 
 5. Serve the site and submit a test registration. Supplier and factory rows appear in `registrations`; packaging supplier rows appear in `packaging_registrations`.
 
-The admin login is available at `/admin/` and redirects authenticated users to `/admin-dashboard/`. Its initial password is `event_admin`. Login creates a revocable 30-day browser session, and the dashboard provides search, edit, delete, refresh, logout, and password-change controls. Direct browser table reads remain blocked by Row Level Security.
+The admin login is available at `/admin/` and redirects authenticated users to `/admin-dashboard/`. Each section shows how many people (unique emails) registered as that type, how many suppliers/factories/packaging suppliers are covered, and which ones have not registered. Only the registering entity counts: a factory selected inside a supplier registration does not mark that factory as registered. **Export Excel** downloads one workbook with Suppliers, Factories, Packaging suppliers, Not registered, and Summary sheets (SheetJS loaded from cdnjs). Its initial password is `event_admin`. Login creates a revocable 30-day browser session, and the dashboard provides search, edit, delete, refresh, logout, and password-change controls. Direct browser table reads remain blocked by Row Level Security.
 
 The publishable key is intended for public browser use when Row Level Security is enabled. Never place a secret key or legacy service-role key in this project. The included grants and policies permit anonymous inserts only; public visitors cannot read registration records. The schema script is safe to run again if the tables, policies, and indexes already exist. A legacy `anon` key also works, but new projects should use the publishable key.
 
@@ -77,6 +79,8 @@ Replace `assets/factory-supplier pair.xlsx` with a workbook using these columns:
 | B | Supplier |
 | C | Factory Code |
 | D | Factory |
+
+Replace `assets/assignments.xlsx` with a workbook using columns A Factory Code, B Factory Name, C Primary Allocation, D Allocation %, E Shared With (for example `Reflex (40%)`). Short packaging names (Epyllion, MR, Reflex, Uniglory, Union, Youngshine) map to the full names in the generator.
 
 Then regenerate the browser data:
 
@@ -95,7 +99,9 @@ Workbook → generated browser mapping → supplier selection → filtered facto
                                   completed registration → Supabase
 ```
 
-The supplier/factory mapping is static in the browser, so changing selections creates no Supabase traffic. On submission, the record stores the registration type, supplier code and name, the selected factory code/name pairs, the user's name, and email.
+The supplier/factory mapping is static in the browser, so changing selections creates no Supabase traffic. Supplier rows store the supplier code/name and selected `factories`; factory rows store their own factory in `factories` and the selected `suppliers`; packaging rows store the packaging supplier and selected `factories`.
+
+After pulling this version, run `supabase-schema.sql` again. It adds the new columns and moves each existing factory registration's supplier into `suppliers`. If the unique index step fails, one email registered the same factory under several suppliers; delete the duplicates and run it again.
 
 ## Deployment
 

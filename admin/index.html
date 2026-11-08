@@ -3,24 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="CartonConnect administration login.">
-  <title>Admin Login | CartonConnect</title>
+  <meta name="description" content="Carton Connect administration login.">
+  <title>Admin Login | Carton Connect</title>
   <link rel="icon" href="../assets/favicon.png" type="image/png">
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="admin.css">
 </head>
-<body class="admin-body">
-  <header class="site-header">
-    <div class="header-inner">
-      <a class="brand" href="../" aria-label="CartonConnect registration"><img class="pacd-logo" src="../assets/pacd.png" alt="PACD"></a>
-      <div class="title-block"><p class="eyebrow">Administration</p><h1>CartonConnect</h1></div>
+<body>
+  <div class="split">
+    <aside class="rail" aria-label="Carton Connect">
+      <div class="rail-inner">
+      <p class="wordmark">Carton Connect</p>
+      <p class="eyebrow">Administration</p>
+      <h1>Registration admin</h1>
+      <p class="rail-text">Review who has requested access to the Primark Carton Ordering &amp; Supply Integration Platform, and which suppliers, factories and packaging suppliers are still missing.</p>
+      </div>
+      <svg class="rail-cartons" viewBox="0 0 560 420" aria-hidden="true">
+        <defs><path id="carton" d="M0 0 130-65 260 0v130l-130 65L0 130Z M0 0l130 65L260 0 M130 65v130 M65-32.5l130 65"/></defs>
+        <use href="#carton" x="150" y="80"/>
+        <use href="#carton" x="20" y="210"/>
+        <use href="#carton" x="280" y="210"/>
+      </svg>
+    </aside>
+
+    <div class="main-col">
+    <header class="main-head">
+      <a href="../" aria-label="Carton Connect registration"><img class="pacd-logo" src="../assets/pacd.png" alt="PacD"></a>
       <img class="primark-logo" src="../assets/primark-logo.png" alt="Primark">
-    </div>
-  </header>
+    </header>
   <main class="login-main">
-    <form id="admin-login-form" class="login-card" novalidate>
-      <p class="step-label">Admin access</p>
+    <form id="admin-login-form" class="panel login-card" novalidate>
+      <p class="eyebrow">Admin access</p>
       <h2>Sign in</h2>
+      <p class="login-text">Review and manage Carton Connect registrations</p>
       <div class="field">
         <label for="admin-password">Password</label>
         <div class="password-control">
@@ -35,6 +50,9 @@
       <button class="submit-button" type="submit"><span>Sign in</span></button>
     </form>
   </main>
+  <footer class="page-footer"><p>&copy; <span id="year"></span> PAC-D · Carton Connect</p></footer>
+    </div>
+  </div>
   <script src="../supabase-config.js"></script>
   <script src="admin.js"></script>
 </body>

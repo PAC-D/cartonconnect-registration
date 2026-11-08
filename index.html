@@ -3,90 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Register for CartonConnect.">
-  <title>Registration | CartonConnect</title>
+  <meta name="description" content="Request access to Carton Connect, the Primark Carton Ordering &amp; Supply Integration Platform by PAC-D.">
+  <title>Registration | Carton Connect</title>
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <dialog id="registration-type-dialog" class="type-dialog" aria-labelledby="type-dialog-title">
-    <div class="type-dialog-brand">
-      <img src="assets/pacd.png" alt="PACD">
-      <span aria-hidden="true"></span>
-      <img src="assets/primark-logo.png" alt="Primark">
-    </div>
-    <div class="type-dialog-heading">
-      <h2 id="type-dialog-title">How would you like to register?</h2>
-    </div>
-    <div class="type-options">
-      <button id="choose-supplier" class="type-option" type="button">
-        <span class="type-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M4 21V7l8-4 8 4v14M8 21v-4h8v4M8 9h2m4 0h2m-8 4h2m4 0h2"/></svg>
-        </span>
-        <span><strong>Register as Supplier</strong><small>Select your supplier and assigned factories.</small></span>
-        <svg class="type-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m13.5 5 7 7-7 7-1.4-1.4 4.6-4.6H3v-2h13.7l-4.6-4.6L13.5 5Z"/></svg>
-      </button>
-      <button id="choose-factory" class="type-option" type="button">
-        <span class="type-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M3 21V9l6 3V9l6 3V4h6v17M3 21h18M7 17h2m4 0h2m4 0h2"/></svg>
-        </span>
-        <span><strong>Register as Factory</strong><small>Select your factory and an allocated supplier.</small></span>
-        <svg class="type-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m13.5 5 7 7-7 7-1.4-1.4 4.6-4.6H3v-2h13.7l-4.6-4.6L13.5 5Z"/></svg>
-      </button>
-      <button id="choose-packaging" class="type-option" type="button">
-        <span class="type-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4 8-4V7m-8 4v10"/></svg>
-        </span>
-        <span><strong>Register as Packaging Supplier</strong><small>Select a packaging supplier and enter your details.</small></span>
-        <svg class="type-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m13.5 5 7 7-7 7-1.4-1.4 4.6-4.6H3v-2h13.7l-4.6-4.6L13.5 5Z"/></svg>
-      </button>
-    </div>
-  </dialog>
 
-  <header class="site-header">
-    <div class="header-inner">
-      <a class="brand" href="./" aria-label="CartonConnect home">
-        <img class="pacd-logo" src="assets/pacd.png" alt="PACD">
-      </a>
-      <div class="title-block">
-        <p class="eyebrow">Supplier onboarding</p>
-        <h1>CartonConnect</h1>
+  <div class="split">
+    <aside class="rail" aria-label="Registration progress">
+      <div class="rail-inner">
+      <p class="wordmark">Carton Connect</p>
+      <p class="eyebrow">Registration</p>
+      <h1>Request access to Carton Connect</h1>
+      <p class="rail-text">The Primark Carton Ordering &amp; Supply Integration Platform by PAC-D. You will only see the allocations you select here.</p>
+      <ol class="steps">
+        <li data-step="type"><span class="step-dot" aria-hidden="true"></span><span><strong>Registration type</strong><small id="step-type-detail">Supplier, factory or packaging supplier</small></span></li>
+        <li data-step="allocations"><span class="step-dot" aria-hidden="true"></span><span><strong>Allocations</strong><small id="step-allocations-detail">What you work with</small></span></li>
+        <li data-step="details"><span class="step-dot" aria-hidden="true"></span><span><strong>Your details</strong><small>Name and work email</small></span></li>
+      </ol>
+      <p class="help-text">Need help? <a href="mailto:cartonconnect@pac-d.com">cartonconnect@pac-d.com</a></p>
       </div>
+      <svg class="rail-cartons" viewBox="0 0 560 420" aria-hidden="true">
+        <defs><path id="carton" d="M0 0 130-65 260 0v130l-130 65L0 130Z M0 0l130 65L260 0 M130 65v130 M65-32.5l130 65"/></defs>
+        <use href="#carton" x="150" y="80"/>
+        <use href="#carton" x="20" y="210"/>
+        <use href="#carton" x="280" y="210"/>
+      </svg>
+    </aside>
+
+    <div class="main-col">
+    <header class="main-head">
+      <a href="./" aria-label="Carton Connect registration"><img class="pacd-logo" src="assets/pacd.png" alt="PacD"></a>
       <img class="primark-logo" src="assets/primark-logo.png" alt="Primark">
-    </div>
-  </header>
-
-  <button class="change-type-button page-type-switch" type="button" data-open-type-dialog>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h11l-3-3m3 3-3 3M16 17H5l3 3m-3-3 3-3"/></svg>
-    <span>Change registration type</span>
-  </button>
-
-  <main>
-    <section class="intro" aria-labelledby="registration-heading">
-      <div>
-        <p class="step-label" id="page-step-label">Supplier registration</p>
-        <h2 id="registration-heading">Create your supplier access request</h2>
-      </div>
-    </section>
-
-    <form id="registration-form" class="registration-card" novalidate>
-      <div class="form-heading">
-        <div class="form-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.25"/><path d="M5.75 20v-1.5A6.25 6.25 0 0 1 12 12.25a6.25 6.25 0 0 1 6.25 6.25V20"/></svg>
+    </header>
+    <main class="panel">
+      <section class="type-section" id="type-section" aria-labelledby="type-title">
+        <h2 class="section-title" id="type-title"><span class="step-num" aria-hidden="true">1</span>How do you work with Primark?</h2>
+        <div class="type-cards" role="radiogroup" aria-labelledby="type-title">
+          <label class="type-card">
+            <input type="radio" name="registration-type" value="supplier">
+            <span class="type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V7l8-4 8 4v14M8 21v-4h8v4M8 9h2m4 0h2m-8 4h2m4 0h2"/></svg></span>
+            <span class="type-text"><strong>Supplier</strong><small>Garment supplier with assigned factories</small></span>
+            <span class="type-check" aria-hidden="true"></span>
+          </label>
+          <label class="type-card">
+            <input type="radio" name="registration-type" value="factory">
+            <span class="type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 21V9l6 3V9l6 3V4h6v17M3 21h18M7 17h2m4 0h2m4 0h2"/></svg></span>
+            <span class="type-text"><strong>Factory</strong><small>Factory working with one or more suppliers</small></span>
+            <span class="type-check" aria-hidden="true"></span>
+          </label>
+          <label class="type-card">
+            <input type="radio" name="registration-type" value="packaging">
+            <span class="type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4 8-4V7m-8 4v10"/></svg></span>
+            <span class="type-text"><strong>Packaging supplier</strong><small>Packaging supplier for assigned factories</small></span>
+            <span class="type-check" aria-hidden="true"></span>
+          </label>
         </div>
-        <div>
-          <h3>Registration details</h3>
-          <p>All fields are required.</p>
-        </div>
-      </div>
+        <p class="type-hint" id="type-hint">Choose a registration type to continue</p>
+      </section>
+
+    <form id="registration-form" class="reg-form" novalidate hidden>
+      <h2 class="section-title"><span class="step-num" aria-hidden="true">2</span>Allocations</h2>
 
       <div class="form-grid">
         <div class="field field-full">
-          <label for="supplier-search">Supplier Name <span aria-hidden="true">*</span></label>
+          <label for="supplier-search">Supplier <span aria-hidden="true">*</span></label>
           <div class="combobox" id="supplier-combobox">
             <div class="combo-control">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-4.4-4.4a8 8 0 1 0-1.4 1.4l4.4 4.4L21 20ZM5 11a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z"/></svg>
-              <input id="supplier-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="supplier-options" placeholder="Search and select a supplier" autocomplete="off" required>
+              <input id="supplier-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="supplier-options" placeholder="Search suppliers" autocomplete="off" required>
               <button class="clear-button" id="clear-supplier" type="button" aria-label="Clear supplier" hidden>&times;</button>
               <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5 1.5 1.5-6.5 6.5L5.5 11 7 9.5Z"/></svg>
             </div>
@@ -97,7 +83,7 @@
 
         <div class="field field-full">
           <div class="label-row">
-            <label for="factory-search">Factory Name <span aria-hidden="true">*</span></label>
+            <label for="factory-search">Factories <span aria-hidden="true">*</span></label>
             <span id="factory-count" class="selection-count" aria-live="polite"></span>
           </div>
           <p class="field-note">The registered user will only be able to work with the factories selected here.</p>
@@ -108,12 +94,12 @@
               <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5 1.5 1.5-6.5 6.5L5.5 11 7 9.5Z"/></svg>
             </div>
             <div id="factory-options" class="options-panel" hidden></div>
-            <div id="selected-factories" class="selected-chips"></div>
+            <div id="selected-factories" class="picked-list"></div>
           </div>
           <p class="field-error" id="factory-error"></p>
         </div>
 
-        <div class="divider field-full"><span>Your information</span></div>
+        <h2 class="section-title field-full"><span class="step-num" aria-hidden="true">3</span>Your details</h2>
 
         <div class="field">
           <label for="full-name">Name <span aria-hidden="true">*</span></label>
@@ -137,24 +123,16 @@
       <p class="privacy-note">By submitting, you confirm that the information provided is accurate.</p>
     </form>
 
-    <form id="factory-registration-form" class="registration-card" novalidate hidden>
-      <div class="form-heading">
-        <div class="form-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M3 21V9l6 3V9l6 3V4h6v17M3 21h18M7 17h2m4 0h2m4 0h2"/></svg>
-        </div>
-        <div>
-          <h3>Factory registration</h3>
-          <p>All fields are required.</p>
-        </div>
-      </div>
+    <form id="factory-registration-form" class="reg-form" novalidate hidden>
+      <h2 class="section-title"><span class="step-num" aria-hidden="true">2</span>Allocations</h2>
 
       <div class="form-grid">
         <div class="field field-full">
-          <label for="factory-registration-search">Factory Name <span aria-hidden="true">*</span></label>
+          <label for="factory-registration-search">Factory <span aria-hidden="true">*</span></label>
           <div class="combobox" id="factory-registration-combobox">
             <div class="combo-control">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-4.4-4.4a8 8 0 1 0-1.4 1.4l4.4 4.4L21 20ZM5 11a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z"/></svg>
-              <input id="factory-registration-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="factory-registration-options" placeholder="Search and select a factory" autocomplete="off" required>
+              <input id="factory-registration-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="factory-registration-options" placeholder="Search factories" autocomplete="off" required>
               <button class="clear-button" id="clear-registration-factory" type="button" aria-label="Clear factory" hidden>&times;</button>
               <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5 1.5 1.5-6.5 6.5L5.5 11 7 9.5Z"/></svg>
             </div>
@@ -164,21 +142,25 @@
         </div>
 
         <div class="field field-full">
-          <label for="allocated-supplier-search">Allocated Supplier <span aria-hidden="true">*</span></label>
+          <div class="label-row">
+            <label for="allocated-supplier-search">Suppliers <span aria-hidden="true">*</span></label>
+            <span id="allocated-supplier-count" class="selection-count" aria-live="polite"></span>
+          </div>
           <p class="field-note">Only suppliers allocated to the selected factory are available.</p>
-          <div class="combobox is-disabled" id="allocated-supplier-combobox">
+          <div class="multi-select is-disabled" id="allocated-supplier-multiselect">
             <div class="combo-control">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-4.4-4.4a8 8 0 1 0-1.4 1.4l4.4 4.4L21 20ZM5 11a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z"/></svg>
               <input id="allocated-supplier-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="allocated-supplier-options" placeholder="Select a factory first" autocomplete="off" disabled required>
-              <button class="clear-button" id="clear-allocated-supplier" type="button" aria-label="Clear allocated supplier" hidden>&times;</button>
               <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5 1.5 1.5-6.5 6.5L5.5 11 7 9.5Z"/></svg>
             </div>
-            <div id="allocated-supplier-options" class="options-panel" role="listbox" hidden></div>
+            <div id="allocated-supplier-options" class="options-panel" hidden></div>
+            <div id="selected-suppliers" class="picked-list"></div>
           </div>
+          <p id="no-suppliers-note" class="form-status error" hidden>No assigned suppliers for this factory. Please contact <a href="mailto:cartonconnect@pac-d.com">cartonconnect@pac-d.com</a>.</p>
           <p class="field-error" id="allocated-supplier-error"></p>
         </div>
 
-        <div class="divider field-full"><span>Your information</span></div>
+        <h2 class="section-title field-full"><span class="step-num" aria-hidden="true">3</span>Your details</h2>
 
         <div class="field">
           <label for="factory-name">Name <span aria-hidden="true">*</span></label>
@@ -202,20 +184,12 @@
       <p class="privacy-note">By submitting, you confirm that the information provided is accurate.</p>
     </form>
 
-    <form id="packaging-registration-form" class="registration-card" novalidate hidden>
-      <div class="form-heading">
-        <div class="form-icon package-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4 8-4V7m-8 4v10"/></svg>
-        </div>
-        <div>
-          <h3>Packaging supplier registration</h3>
-          <p>All fields are required.</p>
-        </div>
-      </div>
+    <form id="packaging-registration-form" class="reg-form" novalidate hidden>
+      <h2 class="section-title"><span class="step-num" aria-hidden="true">2</span>Allocations</h2>
 
       <div class="form-grid">
         <div class="field field-full">
-          <label for="packaging-supplier">Packaging Supplier <span aria-hidden="true">*</span></label>
+          <label for="packaging-supplier">Packaging supplier <span aria-hidden="true">*</span></label>
           <select id="packaging-supplier" name="packaging_supplier" required>
             <option value="">Select a packaging supplier</option>
             <option value="Epyllion Ltd.">Epyllion Ltd.</option>
@@ -228,7 +202,25 @@
           <p class="field-error" id="packaging-supplier-error"></p>
         </div>
 
-        <div class="divider field-full"><span>Your information</span></div>
+        <div class="field field-full">
+          <div class="label-row">
+            <label for="packaging-factory-search">Factories <span aria-hidden="true">*</span></label>
+            <span id="packaging-factory-count" class="selection-count" aria-live="polite"></span>
+          </div>
+          <p class="field-note">Only factories assigned to the selected packaging supplier are available.</p>
+          <div class="multi-select is-disabled" id="packaging-factory-multiselect">
+            <div class="combo-control">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-4.4-4.4a8 8 0 1 0-1.4 1.4l4.4 4.4L21 20ZM5 11a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z"/></svg>
+              <input id="packaging-factory-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="packaging-factory-options" placeholder="Select a packaging supplier first" autocomplete="off" disabled required>
+              <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5 1.5 1.5-6.5 6.5L5.5 11 7 9.5Z"/></svg>
+            </div>
+            <div id="packaging-factory-options" class="options-panel" hidden></div>
+            <div id="packaging-selected-factories" class="picked-list"></div>
+          </div>
+          <p class="field-error" id="packaging-factory-error"></p>
+        </div>
+
+        <h2 class="section-title field-full"><span class="step-num" aria-hidden="true">3</span>Your details</h2>
 
         <div class="field">
           <label for="packaging-name">Name <span aria-hidden="true">*</span></label>
@@ -251,15 +243,17 @@
       </button>
       <p class="privacy-note">By submitting, you confirm that the information provided is accurate.</p>
     </form>
-  </main>
+    </main>
 
-  <footer>
-    <p>&copy; <span id="year"></span> PACD. CartonConnect.</p>
-    <p class="developer-credit">Developed by <a href="https://github.com/recursid" target="_blank" rel="noopener noreferrer">RecurSID</a></p>
+  <footer class="page-footer">
+    <p>&copy; <span id="year"></span> PAC-D · Carton Connect</p>
   </footer>
+    </div>
+  </div>
 
   <script src="data/supplier-factories.js"></script>
   <script src="supabase-config.js"></script>
+  <script src="multiselect.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

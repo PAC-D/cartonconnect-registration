@@ -1,4 +1,4 @@
-// Generated from assets/factory-supplier pair.xlsx. Do not edit manually.
+// Generated from assets/factory-supplier pair.xlsx and assets/assignments.xlsx. Do not edit manually.
 window.SUPPLIER_FACTORY_DATA = [
     {
         "code":  "68740",
@@ -1125,3 +1125,886 @@ window.SUPPLIER_FACTORY_DATA = [
                       ]
     }
 ];
+window.FACTORY_LIST = [
+    {
+        "code":  "24718",
+        "name":  "AB Apparels Ltd"
+    },
+    {
+        "code":  "24374",
+        "name":  "ABA Fashion Limited"
+    },
+    {
+        "code":  "20517",
+        "name":  "Afiya Knitwear Ltd PJT"
+    },
+    {
+        "code":  "15391",
+        "name":  "AKH Apparels Ltd PJT"
+    },
+    {
+        "code":  "20979",
+        "name":  "AKH Eco Apparels Ltd PJT"
+    },
+    {
+        "code":  "26387",
+        "name":  "Alfa Patterns BD Ltd"
+    },
+    {
+        "code":  "20331",
+        "name":  "Alim Knit (BD) Ltd"
+    },
+    {
+        "code":  "27408",
+        "name":  "Ananta Apparels Ltd Plot 97 101"
+    },
+    {
+        "code":  "23005",
+        "name":  "Ananta Apparels Ltd Siddirgonj"
+    },
+    {
+        "code":  "27725",
+        "name":  "Ananta Casual Wear Ltd"
+    },
+    {
+        "code":  "20421",
+        "name":  "Ananta Huaxiang Ltd"
+    },
+    {
+        "code":  "26018",
+        "name":  "APS Apparels Limited"
+    },
+    {
+        "code":  "26451",
+        "name":  "AR Tex Composite Ltd"
+    },
+    {
+        "code":  "24040",
+        "name":  "Aspire Garments Ltd PJT"
+    },
+    {
+        "code":  "14482",
+        "name":  "AST Knitwear Ltd PJT"
+    },
+    {
+        "code":  "11121",
+        "name":  "ATS Apparels Ltd"
+    },
+    {
+        "code":  "26006",
+        "name":  "Axis Knitwears Limited"
+    },
+    {
+        "code":  "24634",
+        "name":  "Azmat Apparels Ltd"
+    },
+    {
+        "code":  "24450",
+        "name":  "Bando Eco Apparels Ltd"
+    },
+    {
+        "code":  "21310",
+        "name":  "BD Designs Private Limited PJT"
+    },
+    {
+        "code":  "22585",
+        "name":  "Blue Planet Fashionwear Ltd"
+    },
+    {
+        "code":  "26055",
+        "name":  "Bravo Apparel Manufacturer Ltd"
+    },
+    {
+        "code":  "26005",
+        "name":  "Brothers Fashion LTD"
+    },
+    {
+        "code":  "25383",
+        "name":  "CA Knitwear Ltd"
+    },
+    {
+        "code":  "25361",
+        "name":  "Cheng Yi Garments Industries Ltd"
+    },
+    {
+        "code":  "28381",
+        "name":  "Chorka Apparels Limited"
+    },
+    {
+        "code":  "18757",
+        "name":  "Chorka Textile Limited PJT"
+    },
+    {
+        "code":  "19394",
+        "name":  "Coast to Coast Pvt Ltd PJT"
+    },
+    {
+        "code":  "24447",
+        "name":  "Colors \u0026 Stitches Limited"
+    },
+    {
+        "code":  "27649",
+        "name":  "Colour And Co"
+    },
+    {
+        "code":  "24448",
+        "name":  "Comfit Composite Knit Ltd PKA Comfit Lingerie Limited"
+    },
+    {
+        "code":  "23676",
+        "name":  "Consumer Knitex Limited Unit 2"
+    },
+    {
+        "code":  "23673",
+        "name":  "Consumer Knitex Ltd CKL"
+    },
+    {
+        "code":  "26150",
+        "name":  "Cotton Clothing BD Ltd"
+    },
+    {
+        "code":  "24272",
+        "name":  "Crown Exclusive Wears Ltd"
+    },
+    {
+        "code":  "23908",
+        "name":  "Denim Asia Ltd PJT"
+    },
+    {
+        "code":  "24601",
+        "name":  "Designtex Knitwear Ltd"
+    },
+    {
+        "code":  "22775",
+        "name":  "Dhaka Garments \u0026 Washing Ltd"
+    },
+    {
+        "code":  "18666",
+        "name":  "Divine Design Ltd \u0026 Alamode Apparels Ltd PJT"
+    },
+    {
+        "code":  "26559",
+        "name":  "Echoknits Ltd"
+    },
+    {
+        "code":  "11583",
+        "name":  "Echotex Ltd PJT"
+    },
+    {
+        "code":  "23447",
+        "name":  "Euphoria Apparels Ltd PJT"
+    },
+    {
+        "code":  "18763",
+        "name":  "Everbright Sweater Ltd"
+    },
+    {
+        "code":  "24407",
+        "name":  "Faiza Industries Ltd"
+    },
+    {
+        "code":  "11266",
+        "name":  "Fakir Apparels Ltd PJT"
+    },
+    {
+        "code":  "14100",
+        "name":  "Fakir Knitwears Ltd PJT"
+    },
+    {
+        "code":  "25042",
+        "name":  "Fame Apparels Ltd"
+    },
+    {
+        "code":  "11584",
+        "name":  "Far East Knitting \u0026 Dyeing Industries Ltd PJT"
+    },
+    {
+        "code":  "25218",
+        "name":  "Fortis Garments Limited"
+    },
+    {
+        "code":  "19456",
+        "name":  "Four Brothers Fashion"
+    },
+    {
+        "code":  "18668",
+        "name":  "Four H Apparels Ltd PJT"
+    },
+    {
+        "code":  "25359",
+        "name":  "Frame House Footwear Ltd"
+    },
+    {
+        "code":  "27470",
+        "name":  "Futex Bangladesh Garment Manufacturing Co Ltd"
+    },
+    {
+        "code":  "21750",
+        "name":  "Glory Fashion Wear Ltd"
+    },
+    {
+        "code":  "25787",
+        "name":  "GM Apparels Ltd"
+    },
+    {
+        "code":  "23489",
+        "name":  "Golden Refit Garments Ltd"
+    },
+    {
+        "code":  "20049",
+        "name":  "Golden Stitch Design Limited PJT"
+    },
+    {
+        "code":  "27410",
+        "name":  "Good Bags And Accessories Limited"
+    },
+    {
+        "code":  "24650",
+        "name":  "GoodEarth Apparels Ltd"
+    },
+    {
+        "code":  "15735",
+        "name":  "Goumati Knitwear PJT"
+    },
+    {
+        "code":  "20147",
+        "name":  "Habitus Fashion Ltd"
+    },
+    {
+        "code":  "19151",
+        "name":  "Hasan Tanvir Fashion Wears Ltd PJT"
+    },
+    {
+        "code":  "15378",
+        "name":  "Helicon Ltd"
+    },
+    {
+        "code":  "18001",
+        "name":  "Hop Lun Apparel Limited PJT"
+    },
+    {
+        "code":  "21164",
+        "name":  "Hop Lun Apparel Ltd Unit 2 PJT"
+    },
+    {
+        "code":  "12048",
+        "name":  "Ibrahim Knit Garments Pvt Ltd PJT"
+    },
+    {
+        "code":  "18938",
+        "name":  "Impress Newtex Composite Textile Ltd PJT"
+    },
+    {
+        "code":  "26516",
+        "name":  "Ingenitex BD Limited"
+    },
+    {
+        "code":  "19424",
+        "name":  "International Classic Composite Ltd"
+    },
+    {
+        "code":  "23817",
+        "name":  "Intimate Attire Ltd PJT"
+    },
+    {
+        "code":  "27826",
+        "name":  "Jin Hong Garments Ltd"
+    },
+    {
+        "code":  "26188",
+        "name":  "JL Fashions Ltd"
+    },
+    {
+        "code":  "25236",
+        "name":  "K C Bottom \u0026 Shirt Wear Company"
+    },
+    {
+        "code":  "26163",
+        "name":  "Kaixi Fashion Bangladesh Co Ltd"
+    },
+    {
+        "code":  "27618",
+        "name":  "Kaixi Lingerie Bangladesh Co Ltd"
+    },
+    {
+        "code":  "25406",
+        "name":  "KC Jacket Wear Company"
+    },
+    {
+        "code":  "24608",
+        "name":  "Khantex Fashions Ltd"
+    },
+    {
+        "code":  "20614",
+        "name":  "L Usine Fashions Channapara PJT"
+    },
+    {
+        "code":  "23776",
+        "name":  "Lakhsma Innerwear Ltd PJT"
+    },
+    {
+        "code":  "26425",
+        "name":  "Lantabur Apparels Ltd"
+    },
+    {
+        "code":  "26569",
+        "name":  "Lesquire Limited"
+    },
+    {
+        "code":  "13809",
+        "name":  "Libas Textiles Ltd"
+    },
+    {
+        "code":  "22400",
+        "name":  "Lida Textile \u0026 Dyeing Limited"
+    },
+    {
+        "code":  "23385",
+        "name":  "Lyric Industries Pvt Ltd"
+    },
+    {
+        "code":  "26306",
+        "name":  "Magic Works"
+    },
+    {
+        "code":  "15379",
+        "name":  "Mahdeen Sweater Ltd"
+    },
+    {
+        "code":  "21185",
+        "name":  "Majumder Garments Ltd PJT"
+    },
+    {
+        "code":  "17443",
+        "name":  "Masco Cotton Ltd"
+    },
+    {
+        "code":  "19683",
+        "name":  "MB Knit Fashion PJT"
+    },
+    {
+        "code":  "23609",
+        "name":  "Mehnaz Styles \u0026 Craft Ltd"
+    },
+    {
+        "code":  "22846",
+        "name":  "MG Niche Flair Limited Unit 2"
+    },
+    {
+        "code":  "21531",
+        "name":  "MG Niche Stitch Limited PJT"
+    },
+    {
+        "code":  "26088",
+        "name":  "Modele De Capital Ind Ltd (Unit 2)"
+    },
+    {
+        "code":  "11277",
+        "name":  "Modele De Capital Ind Ltd PJT"
+    },
+    {
+        "code":  "20227",
+        "name":  "Mouchak Knit Composite Ltd PJT"
+    },
+    {
+        "code":  "20159",
+        "name":  "Needle Drop Ltd"
+    },
+    {
+        "code":  "18983",
+        "name":  "Neo Fashion Ltd"
+    },
+    {
+        "code":  "26015",
+        "name":  "New Asia Fashions Limited"
+    },
+    {
+        "code":  "25905",
+        "name":  "New Mehnaz Styles And Crafts Limited"
+    },
+    {
+        "code":  "14512",
+        "name":  "Newage Apparels Ltd"
+    },
+    {
+        "code":  "27798",
+        "name":  "NKM Fashion Limited"
+    },
+    {
+        "code":  "16401",
+        "name":  "Noman Terry Towel Mills Ltd"
+    },
+    {
+        "code":  "18750",
+        "name":  "Norp Knit Industries Limited Unit 1 PJT"
+    },
+    {
+        "code":  "14059",
+        "name":  "Norp Knit Industries Unit 2"
+    },
+    {
+        "code":  "18469",
+        "name":  "Novel Hurricane Knit Garments Ltd PJT"
+    },
+    {
+        "code":  "10077",
+        "name":  "NR Knitting Mills Limited PJT"
+    },
+    {
+        "code":  "25278",
+        "name":  "NRG Knit Composite"
+    },
+    {
+        "code":  "25438",
+        "name":  "Onus Design Ltd PKA Onus Garments Ltd"
+    },
+    {
+        "code":  "17627",
+        "name":  "Orchid Garments Ltd"
+    },
+    {
+        "code":  "26764",
+        "name":  "Oxford Shirts Ltd"
+    },
+    {
+        "code":  "22257",
+        "name":  "Panasia Clothing Ltd PJT"
+    },
+    {
+        "code":  "27639",
+        "name":  "ParaSole Footwear Ltd"
+    },
+    {
+        "code":  "16726",
+        "name":  "Pioneer Knitwears BD Ltd Unit 1"
+    },
+    {
+        "code":  "14279",
+        "name":  "PN Composite"
+    },
+    {
+        "code":  "25399",
+        "name":  "Progress Apparels Bangladesh Ltd"
+    },
+    {
+        "code":  "25696",
+        "name":  "Prudent Fashions Ltd"
+    },
+    {
+        "code":  "10900",
+        "name":  "Rahimaaziz Knitspin Ltd"
+    },
+    {
+        "code":  "20732",
+        "name":  "Raidha Collections Ltd PJT"
+    },
+    {
+        "code":  "15173",
+        "name":  "Reaz Export Apparels Ltd PJT"
+    },
+    {
+        "code":  "21282",
+        "name":  "Remi Holdings Limited PJT"
+    },
+    {
+        "code":  "12741",
+        "name":  "Rhine Dress Ltd PJT"
+    },
+    {
+        "code":  "21111",
+        "name":  "Rizvi Fashions Limited PJT"
+    },
+    {
+        "code":  "19681",
+        "name":  "Romo Fashion Today Ltd PJT"
+    },
+    {
+        "code":  "23445",
+        "name":  "Rose Intimates Ltd PJT"
+    },
+    {
+        "code":  "24777",
+        "name":  "Sadia Fashion Wears Ltd"
+    },
+    {
+        "code":  "18234",
+        "name":  "Saturn Textiles Ltd"
+    },
+    {
+        "code":  "17149",
+        "name":  "SB Style Composite Ltd PJT"
+    },
+    {
+        "code":  "17803",
+        "name":  "Scarlet Knitwears Ltd PJT"
+    },
+    {
+        "code":  "15187",
+        "name":  "Selina Apparels"
+    },
+    {
+        "code":  "18288",
+        "name":  "Sepal Garments Ltd"
+    },
+    {
+        "code":  "22933",
+        "name":  "Shanta Denims Limited"
+    },
+    {
+        "code":  "20079",
+        "name":  "Soorty Textiles BD Limited PJT"
+    },
+    {
+        "code":  "23926",
+        "name":  "Southeast Sweaters Limited PJT"
+    },
+    {
+        "code":  "16534",
+        "name":  "Southern Clothings Ltd PJT"
+    },
+    {
+        "code":  "27035",
+        "name":  "Southern Knitwear Limited"
+    },
+    {
+        "code":  "23952",
+        "name":  "SP Garments Ltd"
+    },
+    {
+        "code":  "25990",
+        "name":  "SQ Celsius LTD"
+    },
+    {
+        "code":  "27586",
+        "name":  "Styrax Fashions Ltd Plot 180"
+    },
+    {
+        "code":  "20015",
+        "name":  "Suad Garments Industries Ltd"
+    },
+    {
+        "code":  "25133",
+        "name":  "Sublime Greentex Ltd"
+    },
+    {
+        "code":  "18926",
+        "name":  "Surma Garments Ltd PJT"
+    },
+    {
+        "code":  "24250",
+        "name":  "T Design Knitwear Limited"
+    },
+    {
+        "code":  "17830",
+        "name":  "Tarasima Apparels Ltd"
+    },
+    {
+        "code":  "23925",
+        "name":  "Target Denim \u0026 Casual Wear Ltd PJT"
+    },
+    {
+        "code":  "14542",
+        "name":  "Target Fine Wear Industries PJT"
+    },
+    {
+        "code":  "22686",
+        "name":  "Textown Ltd and Ornate Knit Garment Industries Ltd"
+    },
+    {
+        "code":  "13036",
+        "name":  "The Shanin Corporation Ltd PJT"
+    },
+    {
+        "code":  "25547",
+        "name":  "Time Sweaters Limited"
+    },
+    {
+        "code":  "25968",
+        "name":  "Triple Apparels Limited"
+    },
+    {
+        "code":  "24442",
+        "name":  "Tropical Knitex Ltd"
+    },
+    {
+        "code":  "20017",
+        "name":  "Trouser Line Ltd PJT"
+    },
+    {
+        "code":  "26278",
+        "name":  "Trust Knit Wear Industries Ltd"
+    },
+    {
+        "code":  "22688",
+        "name":  "UHM Ltd"
+    },
+    {
+        "code":  "22489",
+        "name":  "Ultimate Fashions Limited PJT"
+    },
+    {
+        "code":  "27672",
+        "name":  "Unifa Handbag And Belt (BD) Co Ltd"
+    },
+    {
+        "code":  "19336",
+        "name":  "Universal Menswear Ltd"
+    },
+    {
+        "code":  "27650",
+        "name":  "Urmi Garments Ltd"
+    },
+    {
+        "code":  "22806",
+        "name":  "Vancot Limited PJT"
+    },
+    {
+        "code":  "26293",
+        "name":  "Victoria Intimate Ltd"
+    },
+    {
+        "code":  "26519",
+        "name":  "Vintage Denim Apparels Ltd"
+    },
+    {
+        "code":  "27409",
+        "name":  "Vintage Garments Ltd"
+    },
+    {
+        "code":  "25086",
+        "name":  "Well Lord Knit Wears Ltd"
+    },
+    {
+        "code":  "26447",
+        "name":  "Welldone Apparel Ltd"
+    },
+    {
+        "code":  "20096",
+        "name":  "Windy Apparels Ltd"
+    },
+    {
+        "code":  "26695",
+        "name":  "Winter Dress"
+    },
+    {
+        "code":  "23378",
+        "name":  "Yunusco BD Limited"
+    },
+    {
+        "code":  "24237",
+        "name":  "Z\u0026Z Intimates Ltd"
+    },
+    {
+        "code":  "24635",
+        "name":  "Z-3 Composite Knitwear Limited"
+    }
+];
+window.PACKAGING_FACTORIES = {
+    "Epyllion Ltd.":  [
+                          "20331",
+                          "24447",
+                          "24448",
+                          "24407",
+                          "14100",
+                          "25042",
+                          "25218",
+                          "20049",
+                          "12048",
+                          "27618",
+                          "26569",
+                          "21185",
+                          "17443",
+                          "19683",
+                          "26015",
+                          "18750",
+                          "14059",
+                          "18469",
+                          "26764",
+                          "25696",
+                          "20079",
+                          "25968",
+                          "22489",
+                          "25086",
+                          "24237"
+                      ],
+    "MR Box":  [
+                   "26451",
+                   "25278",
+                   "10077",
+                   "10900"
+               ],
+    "Reflex Packaging Ltd.":  [
+                                  "24374",
+                                  "15391",
+                                  "20979",
+                                  "26387",
+                                  "27408",
+                                  "23005",
+                                  "27725",
+                                  "20421",
+                                  "24040",
+                                  "24450",
+                                  "28381",
+                                  "18757",
+                                  "19394",
+                                  "24448",
+                                  "26150",
+                                  "23908",
+                                  "24601",
+                                  "18666",
+                                  "18668",
+                                  "15735",
+                                  "18001",
+                                  "21164",
+                                  "18938",
+                                  "19424",
+                                  "26306",
+                                  "21531",
+                                  "11277",
+                                  "26088",
+                                  "14512",
+                                  "18750",
+                                  "22257",
+                                  "14279",
+                                  "25399",
+                                  "20732",
+                                  "21282",
+                                  "17803",
+                                  "18288",
+                                  "22933",
+                                  "27586",
+                                  "25133",
+                                  "17830",
+                                  "14542",
+                                  "24250",
+                                  "25547",
+                                  "24442",
+                                  "20017",
+                                  "26278",
+                                  "19336",
+                                  "22806",
+                                  "20096",
+                                  "26695",
+                                  "23378"
+                              ],
+    "Uniglory Packaging Industries Ltd.":  [
+                                               "24718",
+                                               "20517",
+                                               "20421",
+                                               "26018",
+                                               "14482",
+                                               "11121",
+                                               "21310",
+                                               "26055",
+                                               "25383",
+                                               "24447",
+                                               "27649",
+                                               "23676",
+                                               "23673",
+                                               "24272",
+                                               "22775",
+                                               "11583",
+                                               "23447",
+                                               "11266",
+                                               "14100",
+                                               "11584",
+                                               "19456",
+                                               "21750",
+                                               "25787",
+                                               "23489",
+                                               "24650",
+                                               "15735",
+                                               "19151",
+                                               "15378",
+                                               "12048",
+                                               "23817",
+                                               "26163",
+                                               "25406",
+                                               "24608",
+                                               "13809",
+                                               "22400",
+                                               "20614",
+                                               "23385",
+                                               "15379",
+                                               "23609",
+                                               "11277",
+                                               "26088",
+                                               "20227",
+                                               "18983",
+                                               "26015",
+                                               "25905",
+                                               "27798",
+                                               "18469",
+                                               "25438",
+                                               "17627",
+                                               "27639",
+                                               "16726",
+                                               "15173",
+                                               "12741",
+                                               "21111",
+                                               "19681",
+                                               "23445",
+                                               "24777",
+                                               "18234",
+                                               "17149",
+                                               "23926",
+                                               "16534",
+                                               "27035",
+                                               "23952",
+                                               "25990",
+                                               "20015",
+                                               "14542",
+                                               "13036",
+                                               "24442",
+                                               "22688",
+                                               "27650",
+                                               "26293",
+                                               "27409",
+                                               "26447",
+                                               "26695",
+                                               "23378"
+                                           ],
+    "Union Label \u0026 Accessories Ltd.":  [
+                                                "26018",
+                                                "11121",
+                                                "26006",
+                                                "22585",
+                                                "26005",
+                                                "25361",
+                                                "26559",
+                                                "18763",
+                                                "25359",
+                                                "27470",
+                                                "23489",
+                                                "27410",
+                                                "19151",
+                                                "26516",
+                                                "23817",
+                                                "27826",
+                                                "26188",
+                                                "25236",
+                                                "23776",
+                                                "23609",
+                                                "22846",
+                                                "21531",
+                                                "20227",
+                                                "20159",
+                                                "16401",
+                                                "23445",
+                                                "17149",
+                                                "15187",
+                                                "18926",
+                                                "23925",
+                                                "22686",
+                                                "25968",
+                                                "27672",
+                                                "26293"
+                                            ],
+    "Youngshine Packtrims Ltd.":  [
+                                      "24634",
+                                      "20147",
+                                      "26425",
+                                      "26519",
+                                      "24635"
+                                  ]
+};
