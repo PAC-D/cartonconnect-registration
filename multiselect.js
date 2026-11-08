@@ -12,13 +12,13 @@ window.createMultiSelect = function createMultiSelect({ root, input, panel, chip
     input.setAttribute("aria-expanded", String(open));
   }
 
-  const matchesFor = (query) => items.filter((item) => normalise(`${item.name} ${item.code}`).includes(normalise(query)));
+  const matchesFor = (query) => items.filter((item) => normalise(codeLabel ? `${item.name} ${item.code}` : item.name).includes(normalise(query)));
 
-  // Name on the left, code on the right in mono, like a shipping mark.
   function itemLabel(item) {
     const name = document.createElement("span");
     name.className = "item-name";
     name.textContent = item.name;
+    if (!codeLabel) return [name];
     const code = document.createElement("span");
     code.className = "code";
     code.title = codeLabel;
@@ -113,8 +113,23 @@ window.createMultiSelect = function createMultiSelect({ root, input, panel, chip
     changed();
   }
 
-  input.addEventListener("focus", () => { if (!input.disabled) { render(input.value); setOpen(true); } });
-  input.addEventListener("input", () => { render(input.value); setOpen(true); });
+  function commitInput() {
+    const value = input.value.trim();
+    if (!value) return;
+    const exact = items.find((item) => normalise(item.name) === normalise(value) || normalise(item.code) === normalise(value));
+    const item = exact || { code: value, name: value };
+    selected.set(item.code, item);
+    input.value = "";
+    setOpen(false);
+    renderChips();
+    onChange?.();
+  }
+
+  input.addEventListener("input", () => {
+    const hasQuery = Boolean(input.value.trim());
+    if (hasQuery) render(input.value);
+    setOpen(hasQuery);
+  });
   input.addEventListener("keydown", (event) => { if (event.key === "Escape") setOpen(false); });
   // composedPath is fixed at dispatch, so clicks on options removed by re-render still count as inside.
   document.addEventListener("click", (event) => { if (!event.composedPath().includes(root)) setOpen(false); });
@@ -134,6 +149,7 @@ window.createMultiSelect = function createMultiSelect({ root, input, panel, chip
     },
     values: () => [...selected.values()].map(({ code, name }) => ({ code, name })),
     size: () => selected.size,
+    commitInput,
     input
   };
 };

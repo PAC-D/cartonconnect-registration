@@ -48,7 +48,7 @@
   });
   const allocatedSupplierPicker = createMultiSelect({
     root: $("#allocated-supplier-multiselect"), input: $("#allocated-supplier-search"), panel: $("#allocated-supplier-options"),
-    chips: $("#selected-suppliers"), count: $("#allocated-supplier-count"), codeLabel: "Supplier code",
+    chips: $("#selected-suppliers"), count: $("#allocated-supplier-count"), codeLabel: null,
     noun: ["supplier", "suppliers"], emptyMessage: "No suppliers found",
     placeholder: "Search suppliers", disabledPlaceholder: "Select a factory first",
     onChange: () => setFieldError($("#allocated-supplier-search"), "allocated-supplier-error", "")
@@ -63,6 +63,10 @@
 
   const normalise = (value) => value.toLocaleLowerCase().trim();
   const includesQuery = (item, query) => normalise(`${item.name} ${item.code}`).includes(normalise(query));
+  const inputItem = (value, items) => {
+    const name = value.trim();
+    return name ? items.find((item) => normalise(item.name) === normalise(name)) || { code: name, name } : null;
+  };
 
   // An empty message clears the error.
   function setFieldError(input, errorId, message) {
@@ -79,7 +83,7 @@
 
   function renderSingleSelect(panel, items, query, selectedCode, emptyMessage, codeLabel, onSelect) {
     panel.replaceChildren();
-    const matches = items.filter((item) => includesQuery(item, query));
+    const matches = items.filter((item) => codeLabel ? includesQuery(item, query) : normalise(item.name).includes(normalise(query)));
     if (!matches.length) {
       const empty = document.createElement("div");
       empty.className = "empty-option";
@@ -96,18 +100,21 @@
       const text = document.createElement("span");
       text.className = "item-name";
       text.textContent = item.name;
-      const code = document.createElement("span");
-      code.className = "code";
-      code.title = codeLabel;
-      code.textContent = item.code;
-      button.append(text, code);
+      button.append(text);
+      if (codeLabel) {
+        const code = document.createElement("span");
+        code.className = "code";
+        code.title = codeLabel;
+        code.textContent = item.code;
+        button.append(code);
+      }
       button.addEventListener("click", () => onSelect(item));
       panel.append(button);
     });
   }
 
   function renderSuppliers(query = "") {
-    renderSingleSelect(supplierPanel, suppliers, query, state.supplier?.code, "No suppliers found", "Supplier code", selectSupplier);
+    renderSingleSelect(supplierPanel, suppliers, query, state.supplier?.code, "No suppliers found", null, selectSupplier);
   }
 
   function selectSupplier(supplier) {
@@ -157,7 +164,7 @@
 
   function renderPackagingSuppliers(query = "") {
     renderSingleSelect(packagingSupplierPanel, packagingSuppliers, query, state.packagingSupplier?.code,
-      "No packaging suppliers found", "Packaging supplier", selectPackagingSupplier);
+      "No packaging suppliers found", null, selectPackagingSupplier);
   }
 
   function selectPackagingSupplier(supplier) {
@@ -186,12 +193,16 @@
 
   function validate() {
     let valid = true;
+    state.supplier ||= inputItem(supplierInput.value, suppliers);
     const check = (input, errorId, ok, message) => {
       setFieldError(input, errorId, ok ? "" : message);
       if (!ok) valid = false;
     };
-    check(supplierInput, "supplier-error", state.supplier, "Please select a supplier.");
-    if (state.supplier) check(factoryPicker.input, "factory-error", factoryPicker.size(), "Select at least one factory.");
+    check(supplierInput, "supplier-error", supplierInput.value.trim(), "Please enter a supplier.");
+    if (state.supplier) {
+      factoryPicker.commitInput();
+      check(factoryPicker.input, "factory-error", factoryPicker.size(), "Enter at least one factory.");
+    }
     else setFieldError(factoryPicker.input, "factory-error", "");
     check(fullName, "name-error", fullName.value.trim().length >= 2, "Please enter your full name.");
     check(email, "email-error", validEmail(email), "Enter a valid email address.");
@@ -200,12 +211,16 @@
 
   function validateFactoryForm() {
     let valid = true;
+    state.registrationFactory ||= inputItem(registrationFactoryInput.value, factoryList);
     const check = (input, errorId, ok, message) => {
       setFieldError(input, errorId, ok ? "" : message);
       if (!ok) valid = false;
     };
-    check(registrationFactoryInput, "factory-registration-error", state.registrationFactory, "Please select a factory.");
-    if (state.registrationFactory) check(allocatedSupplierPicker.input, "allocated-supplier-error", allocatedSupplierPicker.size(), "Select at least one supplier.");
+    check(registrationFactoryInput, "factory-registration-error", registrationFactoryInput.value.trim(), "Please enter a factory.");
+    if (state.registrationFactory) {
+      allocatedSupplierPicker.commitInput();
+      check(allocatedSupplierPicker.input, "allocated-supplier-error", allocatedSupplierPicker.size(), "Enter at least one supplier.");
+    }
     else setFieldError(allocatedSupplierPicker.input, "allocated-supplier-error", "");
     check(factoryName, "factory-name-error", factoryName.value.trim().length >= 2, "Please enter your full name.");
     check(factoryEmail, "factory-email-error", validEmail(factoryEmail), "Enter a valid email address.");
@@ -214,12 +229,16 @@
 
   function validatePackagingForm() {
     let valid = true;
+    state.packagingSupplier ||= inputItem(packagingSupplierInput.value, packagingSuppliers);
     const check = (input, errorId, ok, message) => {
       setFieldError(input, errorId, ok ? "" : message);
       if (!ok) valid = false;
     };
-    check(packagingSupplierInput, "packaging-supplier-error", state.packagingSupplier, "Please select a packaging supplier.");
-    if (state.packagingSupplier) check(packagingFactoryPicker.input, "packaging-factory-error", packagingFactoryPicker.size(), "Select at least one factory.");
+    check(packagingSupplierInput, "packaging-supplier-error", packagingSupplierInput.value.trim(), "Please enter a packaging supplier.");
+    if (state.packagingSupplier) {
+      packagingFactoryPicker.commitInput();
+      check(packagingFactoryPicker.input, "packaging-factory-error", packagingFactoryPicker.size(), "Enter at least one factory.");
+    }
     else setFieldError(packagingFactoryPicker.input, "packaging-factory-error", "");
     check(packagingName, "packaging-name-error", packagingName.value.trim().length >= 2, "Please enter your full name.");
     check(packagingEmail, "packaging-email-error", validEmail(packagingEmail), "Enter a valid email address.");
@@ -375,47 +394,38 @@
     clearPackagingSupplier(false);
   });
 
-  supplierInput.addEventListener("focus", () => { renderSuppliers(state.supplier ? "" : supplierInput.value); setPanel(supplierInput, supplierPanel, true); });
   supplierInput.addEventListener("input", () => {
-    if (state.supplier && supplierInput.value !== state.supplier.name) {
-      state.supplier = null;
-      factoryPicker.setItems([]);
-      setFieldError(factoryPicker.input, "factory-error", "");
-    }
+    state.supplier = inputItem(supplierInput.value, suppliers);
+    factoryPicker.setItems(state.supplier ? factoryList : []);
+    setFieldError(factoryPicker.input, "factory-error", "");
+    setFieldError(supplierInput, "supplier-error", "");
     clearSupplierButton.hidden = !supplierInput.value;
-    renderSuppliers(supplierInput.value);
-    setPanel(supplierInput, supplierPanel, true);
+    if (state.supplier) renderSuppliers(supplierInput.value);
+    setPanel(supplierInput, supplierPanel, Boolean(state.supplier));
   });
   supplierInput.addEventListener("keydown", (event) => { if (event.key === "Escape") setPanel(supplierInput, supplierPanel, false); });
   clearSupplierButton.addEventListener("click", () => clearSupplier());
 
-  registrationFactoryInput.addEventListener("focus", () => { renderRegistrationFactories(state.registrationFactory ? "" : registrationFactoryInput.value); setPanel(registrationFactoryInput, registrationFactoryPanel, true); });
   registrationFactoryInput.addEventListener("input", () => {
-    if (state.registrationFactory && registrationFactoryInput.value !== state.registrationFactory.name) {
-      state.registrationFactory = null;
-      allocatedSupplierPicker.setItems([]);
-      setFieldError(allocatedSupplierPicker.input, "allocated-supplier-error", "");
-    }
+    state.registrationFactory = inputItem(registrationFactoryInput.value, factoryList);
+    allocatedSupplierPicker.setItems(state.registrationFactory ? supplierList : []);
+    setFieldError(allocatedSupplierPicker.input, "allocated-supplier-error", "");
+    setFieldError(registrationFactoryInput, "factory-registration-error", "");
     clearRegistrationFactoryButton.hidden = !registrationFactoryInput.value;
-    renderRegistrationFactories(registrationFactoryInput.value);
-    setPanel(registrationFactoryInput, registrationFactoryPanel, true);
+    if (state.registrationFactory) renderRegistrationFactories(registrationFactoryInput.value);
+    setPanel(registrationFactoryInput, registrationFactoryPanel, Boolean(state.registrationFactory));
   });
   registrationFactoryInput.addEventListener("keydown", (event) => { if (event.key === "Escape") setPanel(registrationFactoryInput, registrationFactoryPanel, false); });
   clearRegistrationFactoryButton.addEventListener("click", () => clearRegistrationFactory());
 
-  packagingSupplierInput.addEventListener("focus", () => {
-    renderPackagingSuppliers(state.packagingSupplier ? "" : packagingSupplierInput.value);
-    setPanel(packagingSupplierInput, packagingSupplierPanel, true);
-  });
   packagingSupplierInput.addEventListener("input", () => {
-    if (state.packagingSupplier && packagingSupplierInput.value !== state.packagingSupplier.name) {
-      state.packagingSupplier = null;
-      packagingFactoryPicker.setItems([]);
-      setFieldError(packagingFactoryPicker.input, "packaging-factory-error", "");
-    }
+    state.packagingSupplier = inputItem(packagingSupplierInput.value, packagingSuppliers);
+    packagingFactoryPicker.setItems(state.packagingSupplier ? factoryList : []);
+    setFieldError(packagingFactoryPicker.input, "packaging-factory-error", "");
+    setFieldError(packagingSupplierInput, "packaging-supplier-error", "");
     clearPackagingSupplierButton.hidden = !packagingSupplierInput.value;
-    renderPackagingSuppliers(packagingSupplierInput.value);
-    setPanel(packagingSupplierInput, packagingSupplierPanel, true);
+    if (state.packagingSupplier) renderPackagingSuppliers(packagingSupplierInput.value);
+    setPanel(packagingSupplierInput, packagingSupplierPanel, Boolean(state.packagingSupplier));
   });
   packagingSupplierInput.addEventListener("keydown", (event) => { if (event.key === "Escape") setPanel(packagingSupplierInput, packagingSupplierPanel, false); });
   clearPackagingSupplierButton.addEventListener("click", () => clearPackagingSupplier());

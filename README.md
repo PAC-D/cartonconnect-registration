@@ -1,11 +1,12 @@
 # Carton Connect registration
 
-A responsive registration portal for Carton Connect, the PAC-D portal for the Primark carton supply timeline (cartonconnect.pac-d.com). Its look follows the Carton Connect portal. It uses the PACD and Primark assets in `assets/`, filters factories in the browser using the mappings from `factory-supplier pair.xlsx`, and submits only completed registrations to Supabase.
+A responsive registration portal for Carton Connect, the PAC-D portal for the Primark carton supply timeline (cartonconnect.pac-d.com). Its look follows the Carton Connect portal. It uses the PACD and Primark assets in `assets/`, builds searchable entity lists from the supplied workbooks, and submits only completed registrations to Supabase.
 
 ## What is included
 
-- Searchable supplier, factory, and packaging supplier inputs with compact suggestion lists
+- Searchable supplier, factory, and packaging supplier inputs with suggestions shown after typing
 - Sequential searchable multi-selects that unlock after the primary selection, without allocation-pair filtering
+- Non-empty manual entries are accepted when an entity is not in the suggested list
 - Required registration-type chooser for supplier, factory, or packaging supplier onboarding
 - Factory-first registration: one factory with searchable selection of one or more suppliers
 - Packaging supplier registration: searchable packaging supplier with searchable selection of one or more factories
