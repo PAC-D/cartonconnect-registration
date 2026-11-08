@@ -146,7 +146,7 @@
             <label for="allocated-supplier-search">Suppliers <span aria-hidden="true">*</span></label>
             <span id="allocated-supplier-count" class="selection-count" aria-live="polite"></span>
           </div>
-          <p class="field-note">Only suppliers allocated to the selected factory are available.</p>
+          <p class="field-note">The registered user will only be able to work with the suppliers selected here.</p>
           <div class="multi-select is-disabled" id="allocated-supplier-multiselect">
             <div class="combo-control">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-4.4-4.4a8 8 0 1 0-1.4 1.4l4.4 4.4L21 20ZM5 11a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z"/></svg>
@@ -156,7 +156,6 @@
             <div id="allocated-supplier-options" class="options-panel" hidden></div>
             <div id="selected-suppliers" class="picked-list"></div>
           </div>
-          <p id="no-suppliers-note" class="form-status error" hidden>No assigned suppliers for this factory. Please contact <a href="mailto:cartonconnect@pac-d.com">cartonconnect@pac-d.com</a>.</p>
           <p class="field-error" id="allocated-supplier-error"></p>
         </div>
 
@@ -189,16 +188,16 @@
 
       <div class="form-grid">
         <div class="field field-full">
-          <label for="packaging-supplier">Packaging supplier <span aria-hidden="true">*</span></label>
-          <select id="packaging-supplier" name="packaging_supplier" required>
-            <option value="">Select a packaging supplier</option>
-            <option value="Epyllion Ltd.">Epyllion Ltd.</option>
-            <option value="MR Box">MR Box</option>
-            <option value="Reflex Packaging Ltd.">Reflex Packaging Ltd.</option>
-            <option value="Uniglory Packaging Industries Ltd.">Uniglory Packaging Industries Ltd.</option>
-            <option value="Union Label &amp; Accessories Ltd.">Union Label &amp; Accessories Ltd.</option>
-            <option value="Youngshine Packtrims Ltd.">Youngshine Packtrims Ltd.</option>
-          </select>
+          <label for="packaging-supplier-search">Packaging supplier <span aria-hidden="true">*</span></label>
+          <div class="combobox" id="packaging-supplier-combobox">
+            <div class="combo-control">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-4.4-4.4a8 8 0 1 0-1.4 1.4l4.4 4.4L21 20ZM5 11a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z"/></svg>
+              <input id="packaging-supplier-search" name="packaging_supplier" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="packaging-supplier-options" placeholder="Search packaging suppliers" autocomplete="off" required>
+              <button class="clear-button" id="clear-packaging-supplier" type="button" aria-label="Clear packaging supplier" hidden>&times;</button>
+              <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5 1.5 1.5-6.5 6.5L5.5 11 7 9.5Z"/></svg>
+            </div>
+            <div id="packaging-supplier-options" class="options-panel" role="listbox" hidden></div>
+          </div>
           <p class="field-error" id="packaging-supplier-error"></p>
         </div>
 
@@ -207,7 +206,7 @@
             <label for="packaging-factory-search">Factories <span aria-hidden="true">*</span></label>
             <span id="packaging-factory-count" class="selection-count" aria-live="polite"></span>
           </div>
-          <p class="field-note">Only factories assigned to the selected packaging supplier are available.</p>
+          <p class="field-note">The registered user will only be able to work with the factories selected here.</p>
           <div class="multi-select is-disabled" id="packaging-factory-multiselect">
             <div class="combo-control">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-4.4-4.4a8 8 0 1 0-1.4 1.4l4.4 4.4L21 20ZM5 11a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z"/></svg>

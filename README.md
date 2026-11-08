@@ -4,11 +4,11 @@ A responsive registration portal for Carton Connect, the PAC-D portal for the Pr
 
 ## What is included
 
-- Searchable supplier dropdown containing all 68 suppliers from the workbook
-- Supplier-dependent multi-select containing the assigned factories only
+- Searchable supplier, factory, and packaging supplier inputs with compact suggestion lists
+- Sequential searchable multi-selects that unlock after the primary selection, without allocation-pair filtering
 - Required registration-type chooser for supplier, factory, or packaging supplier onboarding
-- Factory-first registration: one factory, multiple suppliers restricted to that factory's allocations. Factories without allocated suppliers show a contact message instead.
-- Packaging supplier registration: one packaging supplier, multiple factories from `assignments.xlsx` (factories shared between packaging suppliers appear for each; allocation % is ignored)
+- Factory-first registration: one factory with searchable selection of one or more suppliers
+- Packaging supplier registration: searchable packaging supplier with searchable selection of one or more factories
 - `/admin` dashboard with separate Supplier, Factory, and Packaging supplier sections, per-section analytics, and Excel export
 - Supplier and factory codes retained as stable identifiers
 - Responsive layout for mobile, tablet, laptop, and desktop
@@ -93,13 +93,12 @@ The generator reads the XLSX file directly, groups rows by supplier code, dedupl
 ## Data flow
 
 ```text
-Workbook → generated browser mapping → supplier selection → filtered factories
-                                    └→ factory selection → allocated suppliers
+Workbooks → generated browser lists → sequential, unfiltered supplier/factory searches
                                                         ↓
                                   completed registration → Supabase
 ```
 
-The supplier/factory mapping is static in the browser, so changing selections creates no Supabase traffic. Supplier rows store the supplier code/name and selected `factories`; factory rows store their own factory in `factories` and the selected `suppliers`; packaging rows store the packaging supplier and selected `factories`.
+The entity lists are static in the browser, so searching and changing selections creates no Supabase traffic. Supplier rows store the supplier code/name and selected `factories`; factory rows store their own factory in `factories` and the selected `suppliers`; packaging rows store the packaging supplier and selected `factories`.
 
 After pulling this version, run `supabase-schema.sql` again. It adds the new columns and moves each existing factory registration's supplier into `suppliers`. If the unique index step fails, one email registered the same factory under several suppliers; delete the duplicates and run it again.
 

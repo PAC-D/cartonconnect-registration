@@ -3,19 +3,11 @@
 
   const suppliers = Array.isArray(window.SUPPLIER_FACTORY_DATA) ? window.SUPPLIER_FACTORY_DATA : [];
   const factoryList = Array.isArray(window.FACTORY_LIST) ? window.FACTORY_LIST : [];
-  const packagingFactories = window.PACKAGING_FACTORIES || {};
-
-  // Every packaging-assigned factory, with the garment suppliers allocated to it (may be none).
-  const suppliersByFactory = new Map();
-  suppliers.forEach((supplier) => supplier.factories.forEach((factory) => {
-    if (!suppliersByFactory.has(factory.code)) suppliersByFactory.set(factory.code, []);
-    suppliersByFactory.get(factory.code).push({ code: supplier.code, name: supplier.name });
-  }));
-  const factories = factoryList.map((factory) => ({ ...factory, suppliers: suppliersByFactory.get(factory.code) || [] }));
-  const factoryByCode = new Map(factories.map((factory) => [factory.code, factory]));
+  const supplierList = suppliers.map(({ code, name }) => ({ code, name }));
+  const packagingSuppliers = Object.keys(window.PACKAGING_FACTORIES || {}).map((name) => ({ code: name, name }));
 
   const $ = (selector) => document.querySelector(selector);
-  const state = { supplier: null, registrationFactory: null };
+  const state = { supplier: null, registrationFactory: null, packagingSupplier: null };
 
   const form = $("#registration-form");
   const supplierInput = $("#supplier-search");
@@ -29,13 +21,14 @@
   const registrationFactoryInput = $("#factory-registration-search");
   const registrationFactoryPanel = $("#factory-registration-options");
   const clearRegistrationFactoryButton = $("#clear-registration-factory");
-  const noSuppliersNote = $("#no-suppliers-note");
   const factoryName = $("#factory-name");
   const factoryEmail = $("#factory-email");
   const factoryStatus = $("#factory-form-status");
 
   const packagingForm = $("#packaging-registration-form");
-  const packagingSupplier = $("#packaging-supplier");
+  const packagingSupplierInput = $("#packaging-supplier-search");
+  const packagingSupplierPanel = $("#packaging-supplier-options");
+  const clearPackagingSupplierButton = $("#clear-packaging-supplier");
   const packagingName = $("#packaging-name");
   const packagingEmail = $("#packaging-email");
   const packagingStatus = $("#packaging-form-status");
@@ -49,21 +42,21 @@
   const factoryPicker = createMultiSelect({
     root: $("#factory-multiselect"), input: $("#factory-search"), panel: $("#factory-options"),
     chips: $("#selected-factories"), count: $("#factory-count"), codeLabel: "Factory code",
-    noun: ["factory", "factories"], emptyMessage: "No assigned factories found",
+    noun: ["factory", "factories"], emptyMessage: "No factories found",
     placeholder: "Search factories", disabledPlaceholder: "Select a supplier first",
     onChange: () => setFieldError($("#factory-search"), "factory-error", "")
   });
   const allocatedSupplierPicker = createMultiSelect({
     root: $("#allocated-supplier-multiselect"), input: $("#allocated-supplier-search"), panel: $("#allocated-supplier-options"),
     chips: $("#selected-suppliers"), count: $("#allocated-supplier-count"), codeLabel: "Supplier code",
-    noun: ["supplier", "suppliers"], emptyMessage: "No allocated suppliers found",
+    noun: ["supplier", "suppliers"], emptyMessage: "No suppliers found",
     placeholder: "Search suppliers", disabledPlaceholder: "Select a factory first",
     onChange: () => setFieldError($("#allocated-supplier-search"), "allocated-supplier-error", "")
   });
   const packagingFactoryPicker = createMultiSelect({
     root: $("#packaging-factory-multiselect"), input: $("#packaging-factory-search"), panel: $("#packaging-factory-options"),
     chips: $("#packaging-selected-factories"), count: $("#packaging-factory-count"), codeLabel: "Factory code",
-    noun: ["factory", "factories"], emptyMessage: "No assigned factories found",
+    noun: ["factory", "factories"], emptyMessage: "No factories found",
     placeholder: "Search factories", disabledPlaceholder: "Select a packaging supplier first",
     onChange: () => setFieldError($("#packaging-factory-search"), "packaging-factory-error", "")
   });
@@ -113,7 +106,6 @@
     });
   }
 
-  // Supplier registration: one supplier, many of its factories.
   function renderSuppliers(query = "") {
     renderSingleSelect(supplierPanel, suppliers, query, state.supplier?.code, "No suppliers found", "Supplier code", selectSupplier);
   }
@@ -125,7 +117,7 @@
     clearSupplierButton.hidden = false;
     setPanel(supplierInput, supplierPanel, false);
     setFieldError(supplierInput, "supplier-error", "");
-    if (changed) factoryPicker.setItems(supplier.factories);
+    if (changed) factoryPicker.setItems(factoryList);
   }
 
   function clearSupplier(focus = true) {
@@ -134,12 +126,12 @@
     clearSupplierButton.hidden = true;
     setPanel(supplierInput, supplierPanel, false);
     factoryPicker.setItems([]);
+    setFieldError(factoryPicker.input, "factory-error", "");
     if (focus) supplierInput.focus();
   }
 
-  // Factory registration: one factory, many of its allocated suppliers.
   function renderRegistrationFactories(query = "") {
-    renderSingleSelect(registrationFactoryPanel, factories, query, state.registrationFactory?.code,
+    renderSingleSelect(registrationFactoryPanel, factoryList, query, state.registrationFactory?.code,
       "No factories found", "Factory code", selectRegistrationFactory);
   }
 
@@ -150,19 +142,42 @@
     clearRegistrationFactoryButton.hidden = false;
     setPanel(registrationFactoryInput, registrationFactoryPanel, false);
     setFieldError(registrationFactoryInput, "factory-registration-error", "");
-    noSuppliersNote.hidden = factory.suppliers.length > 0;
-    if (changed) allocatedSupplierPicker.setItems(factory.suppliers);
-    if (!factory.suppliers.length) allocatedSupplierPicker.input.placeholder = "No assigned suppliers";
+    if (changed) allocatedSupplierPicker.setItems(supplierList);
   }
 
   function clearRegistrationFactory(focus = true) {
     state.registrationFactory = null;
     registrationFactoryInput.value = "";
     clearRegistrationFactoryButton.hidden = true;
-    noSuppliersNote.hidden = true;
     setPanel(registrationFactoryInput, registrationFactoryPanel, false);
     allocatedSupplierPicker.setItems([]);
+    setFieldError(allocatedSupplierPicker.input, "allocated-supplier-error", "");
     if (focus) registrationFactoryInput.focus();
+  }
+
+  function renderPackagingSuppliers(query = "") {
+    renderSingleSelect(packagingSupplierPanel, packagingSuppliers, query, state.packagingSupplier?.code,
+      "No packaging suppliers found", "Packaging supplier", selectPackagingSupplier);
+  }
+
+  function selectPackagingSupplier(supplier) {
+    const changed = state.packagingSupplier?.code !== supplier.code;
+    state.packagingSupplier = supplier;
+    packagingSupplierInput.value = supplier.name;
+    clearPackagingSupplierButton.hidden = false;
+    setPanel(packagingSupplierInput, packagingSupplierPanel, false);
+    setFieldError(packagingSupplierInput, "packaging-supplier-error", "");
+    if (changed) packagingFactoryPicker.setItems(factoryList);
+  }
+
+  function clearPackagingSupplier(focus = true) {
+    state.packagingSupplier = null;
+    packagingSupplierInput.value = "";
+    clearPackagingSupplierButton.hidden = true;
+    setPanel(packagingSupplierInput, packagingSupplierPanel, false);
+    packagingFactoryPicker.setItems([]);
+    setFieldError(packagingFactoryPicker.input, "packaging-factory-error", "");
+    if (focus) packagingSupplierInput.focus();
   }
 
   function validEmail(input) {
@@ -176,7 +191,8 @@
       if (!ok) valid = false;
     };
     check(supplierInput, "supplier-error", state.supplier, "Please select a supplier.");
-    check($("#factory-search"), "factory-error", factoryPicker.size(), "Select at least one factory.");
+    if (state.supplier) check(factoryPicker.input, "factory-error", factoryPicker.size(), "Select at least one factory.");
+    else setFieldError(factoryPicker.input, "factory-error", "");
     check(fullName, "name-error", fullName.value.trim().length >= 2, "Please enter your full name.");
     check(email, "email-error", validEmail(email), "Enter a valid email address.");
     return valid;
@@ -189,11 +205,8 @@
       if (!ok) valid = false;
     };
     check(registrationFactoryInput, "factory-registration-error", state.registrationFactory, "Please select a factory.");
-    if (state.registrationFactory && !state.registrationFactory.suppliers.length) {
-      valid = false; // the no-suppliers note already explains what to do
-    } else {
-      check($("#allocated-supplier-search"), "allocated-supplier-error", allocatedSupplierPicker.size(), "Select at least one supplier.");
-    }
+    if (state.registrationFactory) check(allocatedSupplierPicker.input, "allocated-supplier-error", allocatedSupplierPicker.size(), "Select at least one supplier.");
+    else setFieldError(allocatedSupplierPicker.input, "allocated-supplier-error", "");
     check(factoryName, "factory-name-error", factoryName.value.trim().length >= 2, "Please enter your full name.");
     check(factoryEmail, "factory-email-error", validEmail(factoryEmail), "Enter a valid email address.");
     return valid;
@@ -205,8 +218,9 @@
       setFieldError(input, errorId, ok ? "" : message);
       if (!ok) valid = false;
     };
-    check(packagingSupplier, "packaging-supplier-error", packagingSupplier.value, "Please select a packaging supplier.");
-    check($("#packaging-factory-search"), "packaging-factory-error", packagingFactoryPicker.size(), "Select at least one factory.");
+    check(packagingSupplierInput, "packaging-supplier-error", state.packagingSupplier, "Please select a packaging supplier.");
+    if (state.packagingSupplier) check(packagingFactoryPicker.input, "packaging-factory-error", packagingFactoryPicker.size(), "Select at least one factory.");
+    else setFieldError(packagingFactoryPicker.input, "packaging-factory-error", "");
     check(packagingName, "packaging-name-error", packagingName.value.trim().length >= 2, "Please enter your full name.");
     check(packagingEmail, "packaging-email-error", validEmail(packagingEmail), "Enter a valid email address.");
     return valid;
@@ -269,7 +283,7 @@
       type: Boolean(type),
       allocations: type === "supplier" ? Boolean(state.supplier && factoryPicker.size())
         : type === "factory" ? Boolean(state.registrationFactory && allocatedSupplierPicker.size())
-        : type === "packaging" ? Boolean(packagingSupplier.value && packagingFactoryPicker.size()) : false,
+        : type === "packaging" ? Boolean(state.packagingSupplier && packagingFactoryPicker.size()) : false,
       details: Boolean(details && details[0].value.trim().length >= 2 && validEmail(details[1]))
     };
     let currentSet = false;
@@ -352,13 +366,13 @@
   });
 
   handleSubmit(packagingForm, packagingStatus, validatePackagingForm, () => ({
-    packaging_supplier: packagingSupplier.value,
+    packaging_supplier: state.packagingSupplier.name,
     factories: packagingFactoryPicker.values(),
     full_name: packagingName.value.trim(),
     email: packagingEmail.value.trim().toLocaleLowerCase()
   }), "packaging_registrations", "Thank you. Your packaging supplier registration has been submitted successfully.", () => {
     packagingForm.reset();
-    packagingFactoryPicker.setItems([]);
+    clearPackagingSupplier(false);
   });
 
   supplierInput.addEventListener("focus", () => { renderSuppliers(state.supplier ? "" : supplierInput.value); setPanel(supplierInput, supplierPanel, true); });
@@ -366,6 +380,7 @@
     if (state.supplier && supplierInput.value !== state.supplier.name) {
       state.supplier = null;
       factoryPicker.setItems([]);
+      setFieldError(factoryPicker.input, "factory-error", "");
     }
     clearSupplierButton.hidden = !supplierInput.value;
     renderSuppliers(supplierInput.value);
@@ -378,8 +393,8 @@
   registrationFactoryInput.addEventListener("input", () => {
     if (state.registrationFactory && registrationFactoryInput.value !== state.registrationFactory.name) {
       state.registrationFactory = null;
-      noSuppliersNote.hidden = true;
       allocatedSupplierPicker.setItems([]);
+      setFieldError(allocatedSupplierPicker.input, "allocated-supplier-error", "");
     }
     clearRegistrationFactoryButton.hidden = !registrationFactoryInput.value;
     renderRegistrationFactories(registrationFactoryInput.value);
@@ -388,16 +403,27 @@
   registrationFactoryInput.addEventListener("keydown", (event) => { if (event.key === "Escape") setPanel(registrationFactoryInput, registrationFactoryPanel, false); });
   clearRegistrationFactoryButton.addEventListener("click", () => clearRegistrationFactory());
 
-  packagingSupplier.addEventListener("change", () => {
-    setFieldError(packagingSupplier, "packaging-supplier-error", "");
-    const codes = packagingFactories[packagingSupplier.value] || [];
-    packagingFactoryPicker.setItems(codes.map((code) => factoryByCode.get(code)).filter(Boolean)
-      .sort((a, b) => a.name.localeCompare(b.name)));
+  packagingSupplierInput.addEventListener("focus", () => {
+    renderPackagingSuppliers(state.packagingSupplier ? "" : packagingSupplierInput.value);
+    setPanel(packagingSupplierInput, packagingSupplierPanel, true);
   });
+  packagingSupplierInput.addEventListener("input", () => {
+    if (state.packagingSupplier && packagingSupplierInput.value !== state.packagingSupplier.name) {
+      state.packagingSupplier = null;
+      packagingFactoryPicker.setItems([]);
+      setFieldError(packagingFactoryPicker.input, "packaging-factory-error", "");
+    }
+    clearPackagingSupplierButton.hidden = !packagingSupplierInput.value;
+    renderPackagingSuppliers(packagingSupplierInput.value);
+    setPanel(packagingSupplierInput, packagingSupplierPanel, true);
+  });
+  packagingSupplierInput.addEventListener("keydown", (event) => { if (event.key === "Escape") setPanel(packagingSupplierInput, packagingSupplierPanel, false); });
+  clearPackagingSupplierButton.addEventListener("click", () => clearPackagingSupplier());
 
   document.addEventListener("click", (event) => {
     if (!event.target.closest("#supplier-combobox")) setPanel(supplierInput, supplierPanel, false);
     if (!event.target.closest("#factory-registration-combobox")) setPanel(registrationFactoryInput, registrationFactoryPanel, false);
+    if (!event.target.closest("#packaging-supplier-combobox")) setPanel(packagingSupplierInput, packagingSupplierPanel, false);
   });
 
   [[fullName, "name-error"], [email, "email-error"], [factoryName, "factory-name-error"], [factoryEmail, "factory-email-error"],
@@ -408,5 +434,8 @@
   // Option clicks, typing and selects all bubble here after their own handlers have updated state.
   ["click", "input", "change"].forEach((name) => document.addEventListener(name, updateProgress));
 
+  factoryPicker.setItems([]);
+  allocatedSupplierPicker.setItems([]);
+  packagingFactoryPicker.setItems([]);
   updateProgress();
 })();
