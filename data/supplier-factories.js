@@ -1827,12 +1827,6 @@ window.PACKAGING_FACTORIES = {
                           "25086",
                           "24237"
                       ],
-    "MR Box":  [
-                   "26451",
-                   "25278",
-                   "10077",
-                   "10900"
-               ],
     "Reflex Packaging Ltd.":  [
                                   "24374",
                                   "15391",
