@@ -219,7 +219,7 @@
     check(registrationFactoryInput, "factory-registration-error", registrationFactoryInput.value.trim(), "Please enter a factory.");
     if (state.registrationFactory) {
       allocatedSupplierPicker.commitInput();
-      check(allocatedSupplierPicker.input, "allocated-supplier-error", allocatedSupplierPicker.size(), "Enter at least one supplier.");
+      setFieldError(allocatedSupplierPicker.input, "allocated-supplier-error", "");
     }
     else setFieldError(allocatedSupplierPicker.input, "allocated-supplier-error", "");
     check(factoryName, "factory-name-error", factoryName.value.trim().length >= 2, "Please enter your full name.");
@@ -301,7 +301,7 @@
     const done = {
       type: Boolean(type),
       allocations: type === "supplier" ? Boolean(state.supplier && factoryPicker.size())
-        : type === "factory" ? Boolean(state.registrationFactory && allocatedSupplierPicker.size())
+        : type === "factory" ? Boolean(state.registrationFactory)
         : type === "packaging" ? Boolean(state.packagingSupplier && packagingFactoryPicker.size()) : false,
       details: Boolean(details && details[0].value.trim().length >= 2 && validEmail(details[1]))
     };

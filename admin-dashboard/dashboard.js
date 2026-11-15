@@ -318,7 +318,11 @@
       return;
     }
     const linked = linkedPicker.values();
-    if (!editPrimary || !linked.length) {
+    if (!editPrimary) {
+      status.textContent = `Select a ${section.entityLabel.toLocaleLowerCase()}.`;
+      return;
+    }
+    if (type !== "Factory" && !linked.length) {
       status.textContent = `Select a ${section.entityLabel.toLocaleLowerCase()} and at least one ${section.linkedNoun[0]}.`;
       return;
     }

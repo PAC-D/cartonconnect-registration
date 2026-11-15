@@ -25,8 +25,9 @@ exception
 end
 $$;
 
--- Factory registrations can select several suppliers. Supplier rows keep supplier_code/name;
--- factory rows store their own factory in factories and the chosen suppliers in suppliers.
+-- Factory registrations can optionally select several suppliers. Supplier rows keep
+-- supplier_code/name; factory rows store their own factory in factories and any chosen
+-- suppliers in suppliers.
 alter table public.registrations
 add column if not exists suppliers jsonb not null default '[]'::jsonb;
 alter table public.registrations alter column supplier_code drop not null;
@@ -38,17 +39,15 @@ set suppliers = jsonb_build_array(jsonb_build_object('code', supplier_code, 'nam
     supplier_name = null
 where registration_type = 'Factory' and supplier_code is not null and suppliers = '[]'::jsonb;
 
-do $$
-begin
-  alter table public.registrations
-  add constraint registrations_shape_check check (
-    (registration_type = 'Supplier' and supplier_code is not null and supplier_name is not null)
-    or (registration_type = 'Factory' and jsonb_typeof(suppliers) = 'array' and jsonb_array_length(suppliers) > 0)
-  );
-exception
-  when duplicate_object then null;
-end
-$$;
+-- Recreate this constraint so rerunning the schema also upgrades existing installations
+-- where factory registrations previously required at least one supplier.
+alter table public.registrations
+drop constraint if exists registrations_shape_check;
+alter table public.registrations
+add constraint registrations_shape_check check (
+  (registration_type = 'Supplier' and supplier_code is not null and supplier_name is not null)
+  or (registration_type = 'Factory' and jsonb_typeof(suppliers) = 'array')
+);
 
 do $$
 begin
@@ -283,8 +282,8 @@ begin
     if jsonb_typeof(p_factories) <> 'array' or jsonb_array_length(p_factories) <> 1 then
       raise exception 'A factory registration requires exactly one factory';
     end if;
-    if jsonb_typeof(p_suppliers) <> 'array' or jsonb_array_length(p_suppliers) = 0 then
-      raise exception 'A factory registration requires at least one supplier';
+    if p_suppliers is null or jsonb_typeof(p_suppliers) <> 'array' then
+      raise exception 'Factory suppliers must be an array';
     end if;
     update public.registrations set full_name = trim(p_full_name), email = lower(trim(p_email)),
       supplier_code = null, supplier_name = null, factories = p_factories, suppliers = p_suppliers
