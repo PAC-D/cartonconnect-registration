@@ -200,6 +200,15 @@
     const workbook = XLSX.utils.book_new();
     const summary = [];
     const missing = [];
+    const participants = [];
+    const participantEmails = new Set();
+    ["Supplier", "Factory"].forEach((type) => rowsOf(type).forEach((row) => {
+      const email = row.email.trim();
+      const emailKey = email.toLocaleLowerCase();
+      if (!emailKey || participantEmails.has(emailKey)) return;
+      participantEmails.add(emailKey);
+      participants.push({ "Registered from": type, Name: row.full_name, Email: email });
+    }));
     Object.entries(sections).forEach(([type, section]) => {
       const stats = analyticsFor(type);
       summary.push({ Section: type, "People registered": stats.people, Registrations: stats.rows.length,
@@ -216,6 +225,8 @@
       }));
       XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(rows, { dateNF: "yyyy-mm-dd hh:mm" }),section.noun[1].replace(/^./, (c) => c.toUpperCase()));
     });
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(participants,
+      { header: ["Registered from", "Name", "Email"] }), "Participants list");
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(missing), "Not registered");
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(summary), "Summary");
     XLSX.writeFile(workbook, `cartonconnect-registrations-${new Date().toISOString().slice(0, 10)}.xlsx`);
