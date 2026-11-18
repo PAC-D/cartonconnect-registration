@@ -4,7 +4,7 @@ create table if not exists public.registrations (
   registration_type text not null default 'Supplier' check (registration_type in ('Supplier', 'Factory')),
   supplier_code text,
   supplier_name text,
-  factories jsonb not null check (jsonb_typeof(factories) = 'array' and jsonb_array_length(factories) > 0),
+  factories jsonb not null check (jsonb_typeof(factories) = 'array'),
   suppliers jsonb not null default '[]'::jsonb check (jsonb_typeof(suppliers) = 'array'),
   full_name text not null check (char_length(full_name) between 2 and 120),
   email text not null check (char_length(email) <= 254),
@@ -32,6 +32,13 @@ alter table public.registrations
 add column if not exists suppliers jsonb not null default '[]'::jsonb;
 alter table public.registrations alter column supplier_code drop not null;
 alter table public.registrations alter column supplier_name drop not null;
+
+-- Supplier registrations may have no factories. Recreate the column constraint so
+-- existing installations are upgraded as well as fresh ones.
+alter table public.registrations
+drop constraint if exists registrations_factories_check;
+alter table public.registrations
+add constraint registrations_factories_check check (jsonb_typeof(factories) = 'array');
 
 update public.registrations
 set suppliers = jsonb_build_array(jsonb_build_object('code', supplier_code, 'name', supplier_name)),
@@ -68,24 +75,19 @@ grant insert on table public.registrations to anon;
 revoke all on sequence public.registrations_id_seq from anon, authenticated;
 grant usage on sequence public.registrations_id_seq to anon;
 
--- Anonymous visitors can submit registrations but cannot read them back.
-do $$
-begin
-  create policy "Public can submit registrations"
-  on public.registrations
-  for insert
-  to anon
-  with check (
-    status = 'pending'
-    and registration_type in ('Supplier', 'Factory')
-    and jsonb_typeof(factories) = 'array'
-    and jsonb_array_length(factories) > 0
-    and (registration_type <> 'Factory' or jsonb_array_length(factories) = 1)
-  );
-exception
-  when duplicate_object then null;
-end
-$$;
+-- Anonymous visitors can submit registrations but cannot read them back. Recreate
+-- the policy so supplier registrations can contain an empty factories array.
+drop policy if exists "Public can submit registrations" on public.registrations;
+create policy "Public can submit registrations"
+on public.registrations
+for insert
+to anon
+with check (
+  status = 'pending'
+  and registration_type in ('Supplier', 'Factory')
+  and jsonb_typeof(factories) = 'array'
+  and (registration_type <> 'Factory' or jsonb_array_length(factories) = 1)
+);
 
 -- Prevent duplicate submissions for the same registering supplier/factory and email.
 -- If this fails while upgrading, an email registered the same factory more than once under
@@ -271,8 +273,11 @@ begin
   end if;
 
   if p_registration_type = 'Supplier' then
-    if p_supplier_code is null or p_supplier_name is null or jsonb_typeof(p_factories) <> 'array' or jsonb_array_length(p_factories) = 0 then
-      raise exception 'A supplier and at least one factory are required';
+    if p_supplier_code is null or p_supplier_name is null then
+      raise exception 'A supplier is required';
+    end if;
+    if p_factories is null or jsonb_typeof(p_factories) <> 'array' then
+      raise exception 'Supplier factories must be an array';
     end if;
     update public.registrations set full_name = trim(p_full_name), email = lower(trim(p_email)),
       supplier_code = p_supplier_code, supplier_name = p_supplier_name,

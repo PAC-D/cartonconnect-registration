@@ -201,7 +201,7 @@
     check(supplierInput, "supplier-error", supplierInput.value.trim(), "Please enter a supplier.");
     if (state.supplier) {
       factoryPicker.commitInput();
-      check(factoryPicker.input, "factory-error", factoryPicker.size(), "Enter at least one factory.");
+      setFieldError(factoryPicker.input, "factory-error", "");
     }
     else setFieldError(factoryPicker.input, "factory-error", "");
     check(fullName, "name-error", fullName.value.trim().length >= 2, "Please enter your full name.");
@@ -300,7 +300,7 @@
     const details = { supplier: [fullName, email], factory: [factoryName, factoryEmail], packaging: [packagingName, packagingEmail] }[type];
     const done = {
       type: Boolean(type),
-      allocations: type === "supplier" ? Boolean(state.supplier && factoryPicker.size())
+      allocations: type === "supplier" ? Boolean(state.supplier)
         : type === "factory" ? Boolean(state.registrationFactory)
         : type === "packaging" ? Boolean(state.packagingSupplier && packagingFactoryPicker.size()) : false,
       details: Boolean(details && details[0].value.trim().length >= 2 && validEmail(details[1]))

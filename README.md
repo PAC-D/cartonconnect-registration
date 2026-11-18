@@ -8,6 +8,7 @@ A responsive registration portal for Carton Connect, the PAC-D portal for the Pr
 - Sequential searchable multi-selects that unlock after the primary selection, without allocation-pair filtering
 - Non-empty manual entries are accepted when an entity is not in the suggested list
 - Required registration-type chooser for supplier, factory, or packaging supplier onboarding
+- Supplier registration with an optional searchable selection of factories
 - Factory-first registration: one factory with an optional searchable selection of suppliers
 - Packaging supplier registration: searchable packaging supplier with searchable selection of one or more factories
 - `/admin` dashboard with separate Supplier, Factory, and Packaging supplier sections, per-section analytics, and Excel export
@@ -99,9 +100,9 @@ Workbooks → generated browser lists → sequential, unfiltered supplier/factor
                                   completed registration → Supabase
 ```
 
-The entity lists are static in the browser, so searching and changing selections creates no Supabase traffic. Supplier rows store the supplier code/name and selected `factories`; factory rows store their own factory in `factories` and any selected `suppliers` (an empty array when none are selected); packaging rows store the packaging supplier and selected `factories`.
+The entity lists are static in the browser, so searching and changing selections creates no Supabase traffic. Supplier rows store the supplier code/name and any selected `factories` (an empty array when none are selected); factory rows store their own factory in `factories` and any selected `suppliers` (an empty array when none are selected); packaging rows store the packaging supplier and selected `factories`.
 
-After pulling this version, run `supabase-schema.sql` again. It adds the required columns, allows factory registrations without suppliers, and moves each existing factory registration's supplier into `suppliers`. If the unique index step fails, one email registered the same factory under several suppliers; delete the duplicates and run it again.
+After pulling this version, run `supabase-schema.sql` again. It adds the required columns, allows supplier and factory registrations without linked allocations, and moves each existing factory registration's supplier into `suppliers`. If the unique index step fails, one email registered the same factory under several suppliers; delete the duplicates and run it again.
 
 ## Deployment
 

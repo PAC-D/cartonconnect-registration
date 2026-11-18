@@ -83,14 +83,14 @@
 
         <div class="field field-full">
           <div class="label-row">
-            <label for="factory-search">Factories <span aria-hidden="true">*</span></label>
+            <label for="factory-search">Factories <span class="optional-label">(optional)</span></label>
             <span id="factory-count" class="selection-count" aria-live="polite"></span>
           </div>
-          <p class="field-note">The registered user will only be able to work with the factories selected here.</p>
+          <p class="field-note">Select any factories the registered user should be able to work with.</p>
           <div class="multi-select is-disabled" id="factory-multiselect">
             <div class="combo-control">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 20-4.4-4.4a8 8 0 1 0-1.4 1.4l4.4 4.4L21 20ZM5 11a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z"/></svg>
-              <input id="factory-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="factory-options" placeholder="Select a supplier first" autocomplete="off" disabled required>
+              <input id="factory-search" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="factory-options" placeholder="Select a supplier first" autocomplete="off" disabled>
               <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9.5 5 5 5-5 1.5 1.5-6.5 6.5L5.5 11 7 9.5Z"/></svg>
             </div>
             <div id="factory-options" class="options-panel" hidden></div>
