@@ -74,7 +74,10 @@
     });
     if (!response.ok) {
       let message = "The request could not be completed.";
-      try { message = (await response.json()).message || message; } catch (_) { /* non-JSON response */ }
+      try {
+        const body = await response.json();
+        message = body.code === "23505" ? "This email is already registered." : body.message || message;
+      } catch (_) { /* non-JSON response */ }
       throw new Error(message);
     }
     return response.json();

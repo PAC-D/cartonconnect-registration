@@ -267,7 +267,7 @@
       let detail = "The registration could not be saved.";
       try {
         const body = await response.json();
-        detail = body.code === "23505" ? "This email is already registered for that selection." : body.message || detail;
+        detail = body.code === "23505" ? "This email is already registered." : body.message || detail;
       } catch (_) { /* non-JSON error */ }
       throw new Error(detail);
     }
